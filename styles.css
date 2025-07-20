@@ -104,6 +104,13 @@ body {
     z-index: 101;
 }
 
+.nav-brand a {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+}
+
 .logo {
     height: 50px;
     width: 50px;
@@ -221,19 +228,38 @@ body {
         transition: right var(--transition-normal);
         z-index: 100;
         margin-left: 0;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        /* Ensure menu is hidden by default */
+        visibility: hidden;
+        opacity: 0;
     }
 
     .nav-menu.active {
         right: 0;
+        visibility: visible;
+        opacity: 1;
     }
 
     .nav-toggle {
         display: flex;
+        position: relative;
+        z-index: 101;
+    }
+
+    .nav-toggle:hover {
+        opacity: 0.8;
     }
 
     .nav-link {
         font-size: 1.5rem;
         padding: var(--spacing-sm) var(--spacing-lg);
+        text-align: center;
+        width: 100%;
+        transition: background-color var(--transition-fast);
+    }
+
+    .nav-link:hover {
+        background-color: var(--color-surface);
     }
 }
 

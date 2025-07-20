@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Let's Cook Curry</title>
+    <meta name="description" content="Meet Tanvi and Ankith, the passionate couple behind Let's Cook Curry, dedicated to sharing authentic Indian recipes and culinary traditions.">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="apple-touch-icon" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Additional styles specific to the About page */
+        .about-hero {
+            background: linear-gradient(135deg, rgba(247, 168, 50, 0.05) 0%, rgba(77, 99, 44, 0.05) 100%);
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at center, var(--color-primary-light) 0%, transparent 70%);
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at center, var(--color-accent-light) 0%, transparent 70%);
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .about-hero h1 {
+            font-size: 3rem;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-hero .subtitle {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-section {
+            padding: var(--spacing-xl) 0;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--color-background);
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--color-text);
+        }
+
+        .about-content p {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .about-content p:first-of-type::first-letter {
+            font-size: 3em;
+            float: left;
+            line-height: 0.8;
+            padding-right: 10px;
+            color: var(--color-primary);
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .founders-image {
+            width: 100%;
+            max-width: 500px;
+            margin: var(--spacing-xl) auto;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: block;
+            border: 10px solid white;
+        }
+
+        .signature {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2rem;
+            text-align: center;
+            color: var(--color-accent);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .values-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: var(--color-background-alt);
+            border-radius: var(--border-radius-lg);
+        }
+
+        .value-card {
+            text-align: center;
+            padding: var(--spacing-md);
+        }
+
+        .value-card i {
+            font-size: 2.5rem;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .value-card h3 {
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .about-hero .subtitle {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="index.html">
+                    <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="logo">
+                    <span class="brand-text">Let's Cook Curry</span>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#recipes" class="nav-link">Recipes</a></li>
+                <li><a href="about.html" class="nav-link active">About Us</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- About Hero Section -->
+        <section class="about-hero">
+            <div class="container">
+                <h1>About Us</h1>
+                <div class="subtitle">A Passion for Spice, A Love for Sharing</div>
+            </div>
+        </section>
+
+        <!-- About Content Section -->
+        <section class="about-section">
+            <div class="container">
+                <div class="about-content">
+                    <p>Welcome to Let's Cook Curry! We're Tanvi and Ankith, a husband-and-wife team based in beautiful Sydney, Australia. For us, food has always been more than just a meal; it's a language of love, a bridge between generations, and the centerpiece of our most cherished memories. Our journey with cooking is deeply rooted in our Indian heritage, where every dish tells a story and every spice has a purpose.</p>
+                    
+                    <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg" alt="Spices and ingredients" class="founders-image">
+                    
+                    <p>We've always believed that good food has a unique power to warm the heart and bring people together. There's a special kind of happiness found in the sizzle of spices in a hot pan, the aroma of a slow-cooked curry filling the home, and the shared smiles over a delicious, home-cooked meal. It was this simple, profound joy that inspired us to ask, "Why not share our love for cooking with the world?"</p>
+                    
+                    <p>And so, 'Let's Cook Curry' was born. This website is our little corner of the internet where we share that passion with you. It's more than just a collection of recipes; it's an invitation into our kitchen. We aim to demystify Indian cooking, breaking down traditional techniques into simple, accessible steps for the modern home cook. Whether you're a seasoned chef or just starting your culinary adventures, our goal is to empower you to create authentic, mouth-watering Indian dishes with confidence.</p>
+                    
+                    <p>Thank you for being here. We're so excited to have you join our community. We hope our recipes bring as much warmth and happiness to your table as they do to ours.</p>
+                    
+                    <div class="signature">Happy cooking!</div>
+                    
+                    <div class="values-section">
+                        <div class="value-card">
+                            <i class="fas fa-heart"></i>
+                            <h3>Authenticity</h3>
+                            <p>We honor traditional recipes while making them accessible to modern home cooks.</p>
+                        </div>
+                        <div class="value-card">
+                            <i class="fas fa-users"></i>
+                            <h3>Community</h3>
+                            <p>We believe in the power of food to bring people together across cultures and generations.</p>
+                        </div>
+                        <div class="value-card">
+                            <i class="fas fa-book-open"></i>
+                            <h3>Education</h3>
+                            <p>We're passionate about sharing our knowledge and helping others discover the joy of Indian cooking.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Let's Cook Curry. Made with ❤️ for curry lovers everywhere.</p>
+            <p>Celebrating the rich culinary heritage of India, one recipe at a time.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize mobile navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navToggle.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                });
+                
+                // Close menu when clicking on a link
+                navMenu.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function() {
+                        navToggle.classList.remove('active');
+                        navMenu.classList.remove('active');
+                    });
+                });
+            }
+
+            // Animate sections on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('section, .value-card').forEach(el => {
+                el.classList.add('fade-in');
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

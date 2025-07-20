@@ -957,25 +957,56 @@ function initializeMobileNav() {
     const navMenu = document.querySelector('.nav-menu');
     
     if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function() {
-            navToggle.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
+        // Ensure menu starts closed
+        navToggle.classList.remove('active');
+        navMenu.classList.remove('active');
+        
+        // Remove any existing event listeners to prevent duplicates
+        navToggle.removeEventListener('click', toggleMenu);
+        navToggle.addEventListener('click', toggleMenu);
         
         // Close menu when clicking on a link
         navMenu.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function() {
-                navToggle.classList.remove('active');
-                navMenu.classList.remove('active');
+                closeMenu();
             });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                closeMenu();
+            }
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
         });
     }
 }
 
+function toggleMenu() {
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    navToggle.classList.toggle('active');
+    navMenu.classList.toggle('active');
+}
+
+function closeMenu() {
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    navToggle.classList.remove('active');
+    navMenu.classList.remove('active');
+}
+
 // Setup scroll animations
 function setupScrollAnimations() {
-    // Initialize mobile navigation
-    initializeMobileNav();
+    // Note: Mobile navigation is already initialized in DOMContentLoaded
     
     // Intersection Observer for fade-in effects on scroll
     const observer = new IntersectionObserver((entries) => {
