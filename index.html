@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Let's Cook Curry - Authentic Indian Recipes for Curry Lovers</title>
+    <meta name="description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques. Share your own recipes with our community.">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="apple-touch-icon" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="logo">
+                <span class="brand-text">Let's Cook Curry</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#recipes" class="nav-link">Recipes</a></li>
+                <li><a href="#about" class="nav-link">About Us</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>From Our Kitchen <span class="accent">to Yours</span></h2>
+                <p>Create unforgettable meals and lasting memories, one curry at a time.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" onclick="scrollToRecipes()">Recipes</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg" alt="Spices in spoons with spice ingredients" loading="lazy">
+            </div>
+        </section>
+
+        <!-- Filter Section -->
+        <section class="filters" id="recipes">
+            <div class="container">
+                <h3>Find Your Perfect Curry</h3>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="region-filter">Region</label>
+                        <select id="region-filter" class="filter-select">
+                            <option value="">All Regions</option>
+                            <option value="north">North Indian</option>
+                            <option value="south">South Indian</option>
+                            <option value="east">East Indian</option>
+                            <option value="west">West Indian</option>
+                            <option value="central">Central Indian</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="diet-filter">Dietary</label>
+                        <select id="diet-filter" class="filter-select">
+                            <option value="">All Diets</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="non-veg">Non-Vegetarian</option>
+                            <option value="gluten-free">Gluten-Free</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="spice-filter">Spice Level</label>
+                        <select id="spice-filter" class="filter-select">
+                            <option value="">All Levels</option>
+                            <option value="mild">Mild (🌶️)</option>
+                            <option value="medium">Medium (🌶️🌶️)</option>
+                            <option value="hot">Hot (🌶️🌶️🌶️)</option>
+                            <option value="very-hot">Very Hot (🌶️🌶️🌶️🌶️)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recipe Grid -->
+        <section class="recipes">
+            <div class="container">
+                <div class="recipe-grid" id="recipe-grid">
+                    <!-- Recipes will be populated by JavaScript -->
+                </div>
+                <div class="load-more">
+                    <button class="btn btn-secondary" onclick="loadMoreRecipes()">Load More Recipes</button>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Recipe Modal -->
+        <div class="modal" id="recipe-modal">
+            <div class="modal-content">
+                <button class="close" onclick="closeModal()" aria-label="Close recipe details" title="Close (Press Esc)"></button>
+                <div class="modal-body" id="modal-body">
+                    <!-- Recipe details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Let's Cook Curry. Made with ❤️ for curry lovers everywhere.</p>
+            <p>Celebrating the rich culinary heritage of India, one recipe at a time.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
