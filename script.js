@@ -288,8 +288,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Load recipes from Supabase
     await loadRecipesFromSupabase();
     
-    // Display initial recipes
-    displayRecipes();
+    // Check for filter parameters in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const regionParam = urlParams.get('region');
+    if (regionParam) {
+        applyFilters(regionParam);
+    } else {
+        // Display initial recipes with no filters
+        displayRecipes();
+    }
+    
+    // Initialize region filtering links
+    initializeRegionLinks();
     
     // Setup scroll animations
     setupScrollAnimations();
@@ -463,10 +473,16 @@ function formatDiet(diet) {
 }
 
 // Apply filters to recipes
-function applyFilters() {
-    const regionFilter = document.getElementById('region-filter').value;
+function applyFilters(regionOverride) {
+    const regionFilter = regionOverride || document.getElementById('region-filter').value;
     const dietFilter = document.getElementById('diet-filter').value;
     const spiceFilter = document.getElementById('spice-filter').value;
+    
+    // Update the region filter dropdown to match the override (if any)
+    if (regionOverride) {
+        const regionSelect = document.getElementById('region-filter');
+        regionSelect.value = regionOverride;
+    }
     
     currentRecipes = allRecipes.filter(recipe => {
         return (!regionFilter || recipe.region === regionFilter) &&
@@ -546,7 +562,7 @@ async function openRecipeModal(recipeId) {
                 </div>
                 <div class="meta-item">
                     <span class="meta-label"><i class="fas fa-pepper-hot"></i> Spice Level</span>
-                    <span class="meta-value">${spiceIcons}</span>
+                    <span class="meta-value">${'🌶️'.repeat(getSpiceLevel(recipe.spice))}</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label"><i class="fas fa-clock"></i> Prep Time</span>
@@ -986,6 +1002,37 @@ function initializeMobileNav() {
             }
         });
     }
+}
+
+// Initialize region links in the footer
+function initializeRegionLinks() {
+    // Find all links with data-filter attribute
+    const regionLinks = document.querySelectorAll('a[data-filter]');
+    
+    regionLinks.forEach(link => {
+        // We don't need to add an event listener here anymore
+        // The links now use href="index.html?region=xxx" format
+        // We'll let the browser handle the navigation normally
+        
+        // But for links on the same page, we'll prevent the default and handle filtering directly
+        if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+            link.addEventListener('click', function(e) {
+                const region = this.dataset.filter;
+                
+                // If we're already on index.html, prevent default navigation and filter directly
+                // This prevents unnecessary page reloads
+                e.preventDefault();
+                
+                // Apply the filter
+                applyFilters(region);
+                
+                // Update URL to reflect the filter (for page refreshes/sharing)
+                const url = new URL(window.location);
+                url.searchParams.set('region', region);
+                window.history.pushState({}, '', url);
+            });
+        }
+    });
 }
 
 function toggleMenu() {
