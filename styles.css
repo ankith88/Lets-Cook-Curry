@@ -81,7 +81,7 @@ body {
 
 /* Header and Navigation */
 .header {
-    background: rgba(255, 255, 255, 0.95);
+    background: #FFFFFF;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(247, 168, 50, 0.1);
     position: sticky;
@@ -132,7 +132,7 @@ body {
 .brand-text {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-primary-dark);
+    color: var(--color-primary);
     font-family: 'Great Vibes', cursive;
     letter-spacing: 0.5px;
 }
@@ -316,7 +316,7 @@ body {
     font-weight: 800;
     margin-bottom: var(--spacing-sm);
     line-height: 1.1;
-    color: var(--color-primary-dark);
+    color: var(--color-primary);
 }
 
 .hero-content h2 span.accent {
@@ -482,7 +482,7 @@ body {
 
 /* Filters Section */
 .filters {
-    background: var(--color-background-alt);
+    background: #FFFFFF;
     padding: var(--spacing-xl) 0;
     position: relative;
     overflow: hidden;
@@ -520,7 +520,7 @@ body {
     transform: translateX(-50%);
     width: 60px;
     height: 3px;
-    background: var(--color-accent);
+    background: var(--color-primary);
     border-radius: 2px;
 }
 
@@ -714,7 +714,7 @@ body {
     left: 0;
     width: 100%;
     height: 70px;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
     opacity: 0;
     transition: opacity var(--transition-normal);
 }
@@ -928,7 +928,7 @@ body {
     box-shadow: var(--shadow-lg);
     transform: translateY(20px);
     transition: transform var(--transition-normal);
-    border: 1px solid rgba(247, 168, 50, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .modal.show {
@@ -1540,7 +1540,7 @@ body {
 .form-textarea:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(247, 168, 50, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-textarea {

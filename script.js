@@ -1,3 +1,13 @@
+// Google Analytics Event Tracking
+function trackEvent(eventCategory, eventAction, eventLabel) {
+    if (window.gtag) {
+        gtag('event', eventAction, {
+            'event_category': eventCategory,
+            'event_label': eventLabel
+        });
+    }
+}
+
 // Supabase configuration
 const SUPABASE_URL = 'https://uifwtvqgiwuttnanxyvz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpZnd0dnFnaXd1dHRuYW54eXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMDgwNjMsImV4cCI6MjA2ODU4NDA2M30.gok42F8kyYq1Ain5IGFZzElyR-j0_Djlcw2Ea0gd4N0';
@@ -478,6 +488,17 @@ function applyFilters(regionOverride) {
     const dietFilter = document.getElementById('diet-filter').value;
     const spiceFilter = document.getElementById('spice-filter').value;
     
+    // Track filter usage in Google Analytics
+    if (regionFilter !== 'all') {
+        trackEvent('Filters', 'Region Filter', regionFilter);
+    }
+    if (dietFilter !== 'all') {
+        trackEvent('Filters', 'Diet Filter', dietFilter);
+    }
+    if (spiceFilter !== 'all') {
+        trackEvent('Filters', 'Spice Filter', spiceFilter);
+    }
+    
     // Update the region filter dropdown to match the override (if any)
     if (regionOverride) {
         const regionSelect = document.getElementById('region-filter');
@@ -540,6 +561,9 @@ async function openRecipeModal(recipeId) {
     const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
     const spiceIcons = '🌶️'.repeat(getSpiceLevel(recipe.spice));
+    
+    // Track recipe view in Google Analytics
+    trackEvent('Recipes', 'View', recipe.name);
     
     // Update URL with recipe slug
     updateURL(recipe.name);
@@ -924,6 +948,12 @@ function initializeReviewSystem(recipeId) {
         const rating = parseInt(document.getElementById('review-rating').value);
         
         if (name && reviewText && rating) {
+            // Track review submission in Google Analytics
+            const recipe = allRecipes.find(r => r.id === recipeId);
+            if (recipe) {
+                trackEvent('User Actions', 'Submit Review', `${recipe.name} (${rating} stars)`);
+            }
+            
             // Disable submit button and show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
             submitBtn.textContent = 'Submitting...';
@@ -1506,7 +1536,11 @@ async function toggleFavorite(recipeId, event) {
     event.preventDefault();
     event.stopPropagation();
     
+    const recipe = allRecipes.find(r => r.id === recipeId);
     const isFavorite = userFavorites.has(recipeId);
+    
+    // Track favorite action in Google Analytics
+    trackEvent('User Actions', isFavorite ? 'Remove Favorite' : 'Add Favorite', recipe ? recipe.name : `Recipe ID: ${recipeId}`);
     
     try {
         if (isFavorite) {
@@ -1578,6 +1612,9 @@ async function shareRecipe(recipeId, event) {
     
     const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
+    
+    // Track share action in Google Analytics
+    trackEvent('User Actions', 'Share Recipe', recipe.name);
     
     // Generate pretty URL with recipe slug for better sharing
     const recipeSlug = generateRecipeSlug(recipe.name);
