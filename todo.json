@@ -1,1 +1,1 @@
-[{"id":"TASK-003","content":"Fix spice level display in recipe modal to match database values","status":"completed","priority":"high"}]
+[{"id":"URL-STRUCTURE-001","content":"Implement URL routing with recipe names formatted as '/recipe-name' with dashes","status":"completed","priority":"high"},{"id":"URL-HISTORY-002","content":"Add browser history management for recipe URLs","status":"completed","priority":"medium"},{"id":"URL-SHARE-003","content":"Update social sharing to use pretty URLs","status":"completed","priority":"medium"}]
