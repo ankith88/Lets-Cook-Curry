@@ -311,6 +311,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize region filtering links
     initializeRegionLinks();
     
+    // Initialize search functionality
+    initializeSearch();
+    
     // Setup scroll animations
     setupScrollAnimations();
 });
@@ -482,11 +485,44 @@ function formatDiet(diet) {
     return diets[diet] || diet;
 }
 
-// Apply filters to recipes
+// Initialize search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('search-input');
+    
+    // Real-time search as user types
+    searchInput.addEventListener('input', () => applyFilters());
+    
+    // Search on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    
+    // Filter dropdown event listeners  
+    document.getElementById('region-filter').addEventListener('change', () => applyFilters());
+    document.getElementById('diet-filter').addEventListener('change', () => applyFilters());
+    document.getElementById('spice-filter').addEventListener('change', () => applyFilters());
+}
+
+// Search functionality
+function performSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    if (searchTerm) {
+        trackEvent('Search', 'Recipe Search', searchTerm);
+    }
+    
+    applyFilters();
+}
+
+// Apply filters and search to recipes
 function applyFilters(regionOverride) {
     const regionFilter = regionOverride || document.getElementById('region-filter').value;
     const dietFilter = document.getElementById('diet-filter').value;
     const spiceFilter = document.getElementById('spice-filter').value;
+    const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
     
     // Track filter usage in Google Analytics
     if (regionFilter !== 'all') {
@@ -506,9 +542,22 @@ function applyFilters(regionOverride) {
     }
     
     currentRecipes = allRecipes.filter(recipe => {
-        return (!regionFilter || recipe.region === regionFilter) &&
-               (!dietFilter || recipe.diet === dietFilter) &&
-               (!spiceFilter || recipe.spice === spiceFilter);
+        // Filter by region, diet, and spice level
+        const regionMatch = !regionFilter || recipe.region === regionFilter;
+        const dietMatch = !dietFilter || recipe.diet === dietFilter;
+        const spiceMatch = !spiceFilter || recipe.spice === spiceFilter;
+        
+        // Search functionality - search in recipe name and ingredients
+        let searchMatch = true;
+        if (searchTerm) {
+            const nameMatch = recipe.name.toLowerCase().includes(searchTerm);
+            const ingredientMatch = recipe.ingredients.some(ingredient => 
+                ingredient.toLowerCase().includes(searchTerm)
+            );
+            searchMatch = nameMatch || ingredientMatch;
+        }
+        
+        return regionMatch && dietMatch && spiceMatch && searchMatch;
     });
     
     // Reset display
@@ -659,7 +708,7 @@ async function openRecipeModal(recipeId) {
             
             ${recipe.story ? `
                 <div class="story-section">
-                    <h3 class="section-title">Story Behind the Recipe</h3>
+                    <h3 class="section-title">About This Recipe</h3>
                     <p style="font-style: italic; color: var(--color-text-light); margin-bottom: var(--spacing-lg);">${recipe.story}</p>
                 </div>
             ` : ''}

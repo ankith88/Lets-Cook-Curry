@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEF5ZLT83X"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-GEF5ZLT83X');
+        gtag('config', 'G-XXXXXXXXXX');
     </script>
     <!-- End Google Analytics -->
     
@@ -131,6 +131,17 @@
         <section class="filters" id="recipes">
             <div class="container">
                 <h3>Find Your Perfect Curry</h3>
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <input type="text" id="search-input" class="search-input" placeholder="Search recipes by name or ingredients..." />
+                        <button class="search-button" onclick="performSearch()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div class="filter-grid">
                     <div class="filter-group">
                         <label for="region-filter">Region</label>

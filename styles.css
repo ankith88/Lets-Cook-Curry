@@ -275,10 +275,13 @@ body {
     gap: var(--spacing-xl);
     align-items: center;
     padding: var(--spacing-xl) var(--spacing-md);
-    max-width: 1200px;
-    margin: 0 auto;
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
     position: relative;
     overflow: hidden;
+    background-color: white;
+    box-sizing: border-box;
 }
 
 .hero::before {
@@ -486,6 +489,90 @@ body {
     padding: var(--spacing-xl) 0;
     position: relative;
     overflow: hidden;
+}
+
+/* Search Bar */
+.search-bar {
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    justify-content: center;
+}
+
+.search-input-group {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    padding-right: 60px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    background-color: var(--color-background);
+    transition: all var(--transition-normal);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(247, 168, 50, 0.1);
+}
+
+.search-input::placeholder {
+    color: var(--color-text-light);
+}
+
+.search-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 8px;
+    cursor: pointer;
+    color: white;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.search-button:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Responsive search bar */
+@media (max-width: 768px) {
+    .search-input-group {
+        max-width: 100%;
+        margin: 0 var(--spacing-sm);
+    }
+    
+    .search-input {
+        font-size: 1rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        padding-right: 50px;
+    }
+    
+    .search-button {
+        padding: 6px;
+        right: 6px;
+    }
+    
+    .search-button svg {
+        width: 18px;
+        height: 18px;
+    }
 }
 
 .filters::before {
@@ -1360,6 +1447,10 @@ body {
         text-align: center;
         padding: var(--spacing-lg) var(--spacing-sm);
         overflow-x: hidden;
+        min-height: 100vh;
+        width: 100vw;
+        margin: 0;
+        box-sizing: border-box;
     }
     
     .hero-content h2 {
