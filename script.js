@@ -1,13 +1,3 @@
-// Google Analytics Event Tracking
-function trackEvent(eventCategory, eventAction, eventLabel) {
-    if (window.gtag) {
-        gtag('event', eventAction, {
-            'event_category': eventCategory,
-            'event_label': eventLabel
-        });
-    }
-}
-
 // Supabase configuration
 const SUPABASE_URL = 'https://uifwtvqgiwuttnanxyvz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpZnd0dnFnaXd1dHRuYW54eXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMDgwNjMsImV4cCI6MjA2ODU4NDA2M30.gok42F8kyYq1Ain5IGFZzElyR-j0_Djlcw2Ea0gd4N0';
@@ -282,22 +272,22 @@ const recipeModal = document.getElementById('recipe-modal');
 const modalBody = document.getElementById('modal-body');
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', async function () {
+document.addEventListener('DOMContentLoaded', async function() {
     // Add slide-up animation to sections
     document.querySelectorAll('section').forEach((section, index) => {
         section.classList.add('fade-in');
         section.style.animationDelay = `${index * 0.2}s`;
     });
-
+    
     // Initialize mobile navigation
     initializeMobileNav();
-
+    
     // Load user favorites first
     await loadUserFavorites();
-
+    
     // Load recipes from Supabase
     await loadRecipesFromSupabase();
-
+    
     // Check for filter parameters in URL
     const urlParams = new URLSearchParams(window.location.search);
     const regionParam = urlParams.get('region');
@@ -307,13 +297,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Display initial recipes with no filters
         displayRecipes();
     }
-
+    
     // Initialize region filtering links
     initializeRegionLinks();
-
-    // Initialize search functionality
-    initializeSearch();
-
+    
     // Setup scroll animations
     setupScrollAnimations();
 });
@@ -323,12 +310,12 @@ async function loadRecipesFromSupabase() {
     try {
         // Show loading state
         recipeGrid.innerHTML = '<div class="loading">Loading recipes...</div>';
-
+        
         // Fetch recipes from Supabase
         const { data: recipes, error } = await supabase
             .from('recipes')
             .select('*');
-
+            
         if (error) {
             console.error('Error fetching recipes:', error);
             // Fallback to sample data if there's an error
@@ -336,18 +323,18 @@ async function loadRecipesFromSupabase() {
             currentRecipes = [...sampleRecipes];
             return;
         }
-
+        
         // Format the recipes data to match our expected structure
         if (recipes && recipes.length > 0) {
             // Fetch ratings for each recipe
             const { data: recipeRatings, error: ratingsError } = await supabase
                 .from('recipe_ratings')
                 .select('*');
-
+                
             if (ratingsError) {
                 console.error('Error fetching ratings:', ratingsError);
             }
-
+            
             // Map recipe data to our format and add ratings
             allRecipes = recipes.map(recipe => {
                 const rating = recipeRatings?.find(r => r.recipe_id === recipe.id);
@@ -369,7 +356,7 @@ async function loadRecipesFromSupabase() {
                     reviews: rating ? parseInt(rating.total_ratings) : 0
                 };
             });
-
+            
             // Set current recipes to all recipes initially
             currentRecipes = [...allRecipes];
         } else {
@@ -391,14 +378,14 @@ async function loadRecipesFromSupabase() {
 // Display recipes in the grid
 function displayRecipes() {
     const recipesToShow = currentRecipes.slice(displayedRecipes, displayedRecipes + recipesPerPage);
-
+    
     recipesToShow.forEach(recipe => {
         const recipeCard = createRecipeCard(recipe);
         recipeGrid.appendChild(recipeCard);
     });
-
+    
     displayedRecipes += recipesToShow.length;
-
+    
     // Hide load more button if all recipes are displayed
     const loadMoreBtn = document.querySelector('.load-more');
     if (displayedRecipes >= currentRecipes.length) {
@@ -412,10 +399,10 @@ function displayRecipes() {
 function createRecipeCard(recipe) {
     const card = document.createElement('div');
     card.className = 'recipe-card fade-in';
-
+    
     const spiceIcons = '🌶️'.repeat(getSpiceLevel(recipe.spice));
     const isFavorite = userFavorites.has(recipe.id);
-
+    
     card.innerHTML = `
         <div class="recipe-image-wrapper">
             <img src="${recipe.image}" alt="${recipe.name}" class="recipe-image" loading="lazy">
@@ -429,7 +416,7 @@ function createRecipeCard(recipe) {
                 </button>
             </div>
         </div>
-        <div class="recipe-content" onclick="openRecipePage(${recipe.id})">
+        <div class="recipe-content" onclick="openRecipeModal(${recipe.id})">
             <h4 class="recipe-title">${recipe.name}</h4>
             <div class="recipe-meta">
                 <span><i class="fas fa-clock"></i> ${recipe.prepTime + recipe.cookTime} min</span>
@@ -448,11 +435,11 @@ function createRecipeCard(recipe) {
             </div>
         </div>
     `;
-
+    
     // Add staggered animation delay
     const index = document.querySelectorAll('.recipe-card').length;
     card.style.animationDelay = `${index * 0.1}s`;
-
+    
     return card;
 }
 
@@ -485,89 +472,29 @@ function formatDiet(diet) {
     return diets[diet] || diet;
 }
 
-// Initialize search functionality
-function initializeSearch() {
-    const searchInput = document.getElementById('search-input');
-
-    // Real-time search as user types
-    searchInput.addEventListener('input', () => applyFilters());
-
-    // Search on Enter key
-    searchInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
-    });
-
-    // Filter dropdown event listeners  
-    document.getElementById('region-filter').addEventListener('change', () => applyFilters());
-    document.getElementById('diet-filter').addEventListener('change', () => applyFilters());
-    document.getElementById('spice-filter').addEventListener('change', () => applyFilters());
-}
-
-// Search functionality
-function performSearch() {
-    const searchInput = document.getElementById('search-input');
-    const searchTerm = searchInput.value.toLowerCase().trim();
-
-    if (searchTerm) {
-        trackEvent('Search', 'Recipe Search', searchTerm);
-    }
-
-    applyFilters();
-}
-
-// Apply filters and search to recipes
+// Apply filters to recipes
 function applyFilters(regionOverride) {
     const regionFilter = regionOverride || document.getElementById('region-filter').value;
     const dietFilter = document.getElementById('diet-filter').value;
     const spiceFilter = document.getElementById('spice-filter').value;
-    const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
-
-    // Track filter usage in Google Analytics
-    if (regionFilter !== 'all') {
-        trackEvent('Filters', 'Region Filter', regionFilter);
-    }
-    if (dietFilter !== 'all') {
-        trackEvent('Filters', 'Diet Filter', dietFilter);
-    }
-    if (spiceFilter !== 'all') {
-        trackEvent('Filters', 'Spice Filter', spiceFilter);
-    }
-
+    
     // Update the region filter dropdown to match the override (if any)
     if (regionOverride) {
         const regionSelect = document.getElementById('region-filter');
         regionSelect.value = regionOverride;
     }
-
+    
     currentRecipes = allRecipes.filter(recipe => {
-        // Filter by region, diet, and spice level
-        const regionMatch = !regionFilter || recipe.region === regionFilter;
-        const dietMatch = !dietFilter || recipe.diet === dietFilter;
-        const spiceMatch = !spiceFilter || recipe.spice === spiceFilter;
-
-        // Search functionality - search in recipe name and ingredients
-        let searchMatch = true;
-        if (searchTerm) {
-            const nameMatch = recipe.name.toLowerCase().includes(searchTerm);
-            const ingredientMatch = recipe.ingredients.some(ingredient =>
-                ingredient.toLowerCase().includes(searchTerm)
-            );
-            searchMatch = nameMatch || ingredientMatch;
-        }
-
-        return regionMatch && dietMatch && spiceMatch && searchMatch;
+        return (!regionFilter || recipe.region === regionFilter) &&
+               (!dietFilter || recipe.diet === dietFilter) &&
+               (!spiceFilter || recipe.spice === spiceFilter);
     });
-
+    
     // Reset display
     recipeGrid.innerHTML = '';
     displayedRecipes = 0;
     displayRecipes();
-
-    // Update meta tags based on filters
-    updateFilterMetaTags(regionFilter, dietFilter, spiceFilter);
-
+    
     // Scroll to results
     document.getElementById('recipes').scrollIntoView({ behavior: 'smooth' });
 }
@@ -577,59 +504,22 @@ function loadMoreRecipes() {
     displayRecipes();
 }
 
-// Generate URL-friendly slug from recipe name
-function generateRecipeSlug(recipeName) {
-    return recipeName
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-        .trim()
-        .replace(/\s+/g, '-'); // Replace spaces with dashes
-}
-
-// Get recipe ID from slug
-function getRecipeIdFromSlug(slug) {
-    const recipe = allRecipes.find(r => generateRecipeSlug(r.name) === slug);
-    return recipe ? recipe.id : null;
-}
-
-// Get recipe slug from ID
-function getRecipeSlugFromId(recipeId) {
-    const recipe = allRecipes.find(r => r.id === recipeId);
-    return recipe ? generateRecipeSlug(recipe.name) : null;
-}
-
-// Update browser URL without page reload
-function updateURL(recipeName) {
-    const slug = generateRecipeSlug(recipeName);
-    const newURL = `${window.location.origin}${window.location.pathname}#${slug}`;
-    window.history.pushState({ recipeSlug: slug }, '', newURL);
-}
-
 // Open recipe modal
 async function openRecipeModal(recipeId) {
     const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
     const spiceIcons = '🌶️'.repeat(getSpiceLevel(recipe.spice));
-
-    // Track recipe view in Google Analytics
-    trackEvent('Recipes', 'View', recipe.name);
-
-    // Update URL with recipe slug
-    updateURL(recipe.name);
-
+    
     // Show loading state in modal
     modalBody.innerHTML = '<div class="loading">Loading recipe details...</div>';
     recipeModal.style.display = 'block';
     document.body.style.overflow = 'hidden';
-
-    // Update page meta tags for SEO
-    updateMetaTags(recipe);
-
+    
     // Add animation classes after a short delay
     setTimeout(() => {
         recipeModal.classList.add('show');
     }, 10);
-
+    
     try {
         // Fetch reviews for this recipe from Supabase
         const { data: reviews, error: reviewError } = await supabase
@@ -637,11 +527,11 @@ async function openRecipeModal(recipeId) {
             .select('*')
             .eq('recipe_id', recipe.id)
             .order('created_at', { ascending: false });
-
+            
         if (reviewError) {
             console.error('Error fetching reviews:', reviewError);
         }
-
+        
         // Build the modal content
         const isFavorite = userFavorites.has(recipe.id);
         modalBody.innerHTML = `
@@ -708,7 +598,7 @@ async function openRecipeModal(recipeId) {
             
             ${recipe.story ? `
                 <div class="story-section">
-                    <h3 class="section-title">About This Recipe</h3>
+                    <h3 class="section-title">Story Behind the Recipe</h3>
                     <p style="font-style: italic; color: var(--color-text-light); margin-bottom: var(--spacing-lg);">${recipe.story}</p>
                 </div>
             ` : ''}
@@ -753,8 +643,8 @@ async function openRecipeModal(recipeId) {
                     </form>
                 </div>
                 <div class="reviews-list" id="reviews-list-${recipe.id}">
-                    ${reviews && reviews.length > 0 ?
-                reviews.map(review => `
+                    ${reviews && reviews.length > 0 ? 
+                        reviews.map(review => `
                             <div class="review-item">
                                 <div class="review-header">
                                     <span class="reviewer-name">${review.name}</span>
@@ -763,9 +653,9 @@ async function openRecipeModal(recipeId) {
                                 <p class="review-text">${review.review}</p>
                                 <span class="review-date">${formatDate(review.created_at)}</span>
                             </div>
-                        `).join('')
-                : '<div class="no-reviews">Be the first to review this recipe!</div>'
-            }
+                        `).join('') 
+                        : '<div class="no-reviews">Be the first to review this recipe!</div>'
+                    }
                 </div>
             </div>
             
@@ -773,11 +663,11 @@ async function openRecipeModal(recipeId) {
                 <p><strong><i class="fas fa-lightbulb"></i> Chef's Tip:</strong> For best results, let the curry rest for 10-15 minutes before serving to allow flavors to meld together.</p>
             </div>
         `;
-
+        
         // Initialize rating and review functionality
         initializeRatingSystem();
         initializeReviewSystem(recipe.id);
-
+        
     } catch (error) {
         console.error('Error loading recipe details:', error);
         modalBody.innerHTML = `
@@ -789,18 +679,13 @@ async function openRecipeModal(recipeId) {
     }
 }
 
-async function openRecipePage(recipeId) {
-    const recipe = allRecipes.find(r => r.id === recipeId);
-    if (!recipe) return;
-}
-
 // Format date for reviews
 function formatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
+    
     if (diffDays === 0) {
         return 'Today';
     } else if (diffDays === 1) {
@@ -819,29 +704,23 @@ function formatDate(dateString) {
 // Close recipe modal
 function closeModal() {
     recipeModal.classList.remove('show');
-
-    // Reset URL to main page
-    window.history.pushState({}, '', `${window.location.origin}${window.location.pathname}`);
-
+    
     // Wait for the animation to complete before hiding the modal
     setTimeout(() => {
         recipeModal.style.display = 'none';
         document.body.style.overflow = 'auto';
-
-        // Reset meta tags to default website tags
-        resetMetaTags();
     }, 300);
 }
 
 // Close modal when clicking outside or pressing Escape
-window.onclick = function (event) {
+window.onclick = function(event) {
     if (event.target === recipeModal) {
         closeModal();
     }
 }
 
 // Close modal with Escape key
-document.addEventListener('keydown', function (event) {
+document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape' && recipeModal.style.display === 'block') {
         closeModal();
     }
@@ -857,12 +736,12 @@ function scrollToRecipes() {
 // Search functionality (can be expanded)
 function searchRecipes(query) {
     const searchTerm = query.toLowerCase();
-    currentRecipes = sampleRecipes.filter(recipe =>
+    currentRecipes = sampleRecipes.filter(recipe => 
         recipe.name.toLowerCase().includes(searchTerm) ||
         recipe.description.toLowerCase().includes(searchTerm) ||
         recipe.ingredients.some(ingredient => ingredient.toLowerCase().includes(searchTerm))
     );
-
+    
     recipeGrid.innerHTML = '';
     displayedRecipes = 0;
     displayRecipes();
@@ -875,12 +754,12 @@ function generateSampleReviews(recipeId) {
         { name: "Rajesh M.", review: "Easy to follow recipe. Turned out great on my first try!", rating: 4 },
         { name: "Sarah L.", review: "Authentic flavors! Reminds me of my grandmother's cooking.", rating: 5 }
     ];
-
+    
     return sampleReviews.map(review => `
         <div class="review-item">
             <div class="review-header">
                 <span class="reviewer-name">${review.name}</span>
-                <span class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</span>
+                <span class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span>
             </div>
             <p class="review-text">${review.review}</p>
             <span class="review-date">2 days ago</span>
@@ -892,34 +771,34 @@ function generateSampleReviews(recipeId) {
 function initializeRatingSystem() {
     const starRating = document.querySelector('.star-rating');
     if (!starRating) return;
-
+    
     const stars = starRating.querySelectorAll('.fa-star');
     const submitBtn = document.getElementById('submit-rating');
     let selectedRating = 0;
     const recipeId = starRating.dataset.recipeId;
-
+    
     stars.forEach(star => {
-        star.addEventListener('mouseenter', function () {
+        star.addEventListener('mouseenter', function() {
             const rating = parseInt(this.dataset.rating);
             highlightStars(stars, rating);
         });
-
-        star.addEventListener('click', function () {
+        
+        star.addEventListener('click', function() {
             selectedRating = parseInt(this.dataset.rating);
             highlightStars(stars, selectedRating);
             submitBtn.style.display = 'inline-block';
         });
     });
-
-    starRating.addEventListener('mouseleave', function () {
+    
+    starRating.addEventListener('mouseleave', function() {
         highlightStars(stars, selectedRating);
     });
-
-    submitBtn.addEventListener('click', async function () {
+    
+    submitBtn.addEventListener('click', async function() {
         if (selectedRating > 0) {
             submitBtn.textContent = 'Submitting...';
             submitBtn.disabled = true;
-
+            
             try {
                 // Insert the rating into Supabase
                 const { data, error } = await supabase
@@ -927,7 +806,7 @@ function initializeRatingSystem() {
                     .insert([
                         { recipe_id: recipeId, rating: selectedRating }
                     ]);
-
+                    
                 if (error) {
                     console.error('Error submitting rating:', error);
                     alert('Error submitting rating. Please try again later.');
@@ -935,7 +814,7 @@ function initializeRatingSystem() {
                     submitBtn.disabled = false;
                     return;
                 }
-
+                
                 alert(`Thank you for rating this recipe ${selectedRating} stars!`);
                 submitBtn.style.display = 'none';
                 submitBtn.textContent = 'Rating Submitted';
@@ -965,67 +844,61 @@ function highlightStars(stars, rating) {
 function initializeReviewSystem(recipeId) {
     const reviewForm = document.querySelector('.review-form');
     if (!reviewForm) return;
-
+    
     // Initialize the review rating stars
     const reviewStars = document.querySelector('.review-star-rating');
     if (reviewStars) {
         const stars = reviewStars.querySelectorAll('.fa-star');
         const ratingInput = document.getElementById('review-rating');
         let selectedRating = 5; // Default rating
-
+        
         // Highlight all stars initially
         highlightStars(stars, selectedRating);
-
+        
         stars.forEach(star => {
-            star.addEventListener('mouseenter', function () {
+            star.addEventListener('mouseenter', function() {
                 const rating = parseInt(this.dataset.rating);
                 highlightStars(stars, rating);
             });
-
-            star.addEventListener('click', function () {
+            
+            star.addEventListener('click', function() {
                 selectedRating = parseInt(this.dataset.rating);
                 highlightStars(stars, selectedRating);
                 ratingInput.value = selectedRating;
             });
         });
-
-        reviewStars.addEventListener('mouseleave', function () {
+        
+        reviewStars.addEventListener('mouseleave', function() {
             highlightStars(stars, selectedRating);
         });
     }
-
-    reviewForm.addEventListener('submit', async function (e) {
+    
+    reviewForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-
+        
         const name = document.getElementById('reviewer-name').value;
         const reviewText = document.getElementById('review-text').value;
         const rating = parseInt(document.getElementById('review-rating').value);
-
+        
         if (name && reviewText && rating) {
-            // Track review submission in Google Analytics
-            const recipe = allRecipes.find(r => r.id === recipeId);
-            if (recipe) {
-                trackEvent('User Actions', 'Submit Review', `${recipe.name} (${rating} stars)`);
-            }
-
             // Disable submit button and show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
             submitBtn.textContent = 'Submitting...';
             submitBtn.disabled = true;
-
+            
             try {
                 // Insert the review into Supabase
                 const { data, error } = await supabase
                     .from('reviews')
                     .insert([
-                        {
+                        { 
                             recipe_id: recipeId,
                             name: name,
                             review: reviewText,
                             rating: rating
                         }
                     ]);
-
+                    
                 if (error) {
                     console.error('Error submitting review:', error);
                     alert('Error submitting review. Please try again later.');
@@ -1033,21 +906,21 @@ function initializeReviewSystem(recipeId) {
                     submitBtn.disabled = false;
                     return;
                 }
-
+                
                 // Add the new review to the list
                 addNewReview(recipeId, name, reviewText, rating);
                 this.reset();
-
+                
                 // Reset the form and update UI
                 submitBtn.textContent = 'Post Review';
                 submitBtn.disabled = false;
-
+                
                 // Reset rating stars to default (5)
                 if (reviewStars) {
                     highlightStars(reviewStars.querySelectorAll('.fa-star'), 5);
                     document.getElementById('review-rating').value = 5;
                 }
-
+                
             } catch (error) {
                 console.error('Unexpected error submitting review:', error);
                 alert('An unexpected error occurred. Please try again later.');
@@ -1062,13 +935,13 @@ function initializeReviewSystem(recipeId) {
 function addNewReview(recipeId, name, reviewText, rating) {
     const reviewsList = document.getElementById(`reviews-list-${recipeId}`);
     if (!reviewsList) return;
-
+    
     // Remove "no reviews" message if it exists
     const noReviews = reviewsList.querySelector('.no-reviews');
     if (noReviews) {
         noReviews.remove();
     }
-
+    
     const newReview = document.createElement('div');
     newReview.className = 'review-item new-review';
     newReview.innerHTML = `
@@ -1079,9 +952,9 @@ function addNewReview(recipeId, name, reviewText, rating) {
         <p class="review-text">${reviewText}</p>
         <span class="review-date">Just now</span>
     `;
-
+    
     reviewsList.insertBefore(newReview, reviewsList.firstChild);
-
+    
     // Add animation
     newReview.style.opacity = '0';
     newReview.style.transform = 'translateY(-20px)';
@@ -1090,7 +963,7 @@ function addNewReview(recipeId, name, reviewText, rating) {
         newReview.style.opacity = '1';
         newReview.style.transform = 'translateY(0)';
     }, 100);
-
+    
     alert('Thank you for your review!');
 }
 
@@ -1098,32 +971,32 @@ function addNewReview(recipeId, name, reviewText, rating) {
 function initializeMobileNav() {
     const navToggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-menu');
-
+    
     if (navToggle && navMenu) {
         // Ensure menu starts closed
         navToggle.classList.remove('active');
         navMenu.classList.remove('active');
-
+        
         // Remove any existing event listeners to prevent duplicates
         navToggle.removeEventListener('click', toggleMenu);
         navToggle.addEventListener('click', toggleMenu);
-
+        
         // Close menu when clicking on a link
         navMenu.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function () {
+            link.addEventListener('click', function() {
                 closeMenu();
             });
         });
-
+        
         // Close menu when clicking outside
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
                 closeMenu();
             }
         });
-
+        
         // Close menu on escape key
-        document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeMenu();
             }
@@ -1135,31 +1008,28 @@ function initializeMobileNav() {
 function initializeRegionLinks() {
     // Find all links with data-filter attribute
     const regionLinks = document.querySelectorAll('a[data-filter]');
-
+    
     regionLinks.forEach(link => {
         // We don't need to add an event listener here anymore
         // The links now use href="index.html?region=xxx" format
         // We'll let the browser handle the navigation normally
-
+        
         // But for links on the same page, we'll prevent the default and handle filtering directly
         if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-            link.addEventListener('click', function (e) {
+            link.addEventListener('click', function(e) {
                 const region = this.dataset.filter;
-
+                
                 // If we're already on index.html, prevent default navigation and filter directly
                 // This prevents unnecessary page reloads
                 e.preventDefault();
-
+                
                 // Apply the filter
                 applyFilters(region);
-
+                
                 // Update URL to reflect the filter (for page refreshes/sharing)
                 const url = new URL(window.location);
                 url.searchParams.set('region', region);
                 window.history.pushState({}, '', url);
-
-                // Update meta tags for the filtered region
-                updateRegionMetaTags(region);
             });
         }
     });
@@ -1168,7 +1038,7 @@ function initializeRegionLinks() {
 function toggleMenu() {
     const navToggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-menu');
-
+    
     navToggle.classList.toggle('active');
     navMenu.classList.toggle('active');
 }
@@ -1176,7 +1046,7 @@ function toggleMenu() {
 function closeMenu() {
     const navToggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-menu');
-
+    
     navToggle.classList.remove('active');
     navMenu.classList.remove('active');
 }
@@ -1184,7 +1054,7 @@ function closeMenu() {
 // Setup scroll animations
 function setupScrollAnimations() {
     // Note: Mobile navigation is already initialized in DOMContentLoaded
-
+    
     // Intersection Observer for fade-in effects on scroll
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -1194,14 +1064,14 @@ function setupScrollAnimations() {
             }
         });
     }, { threshold: 0.1 });
-
+    
     // Observe elements with animation classes
     document.querySelectorAll('.recipe-card, .hero-content, .hero-image, .filter-grid').forEach(el => {
         observer.observe(el);
     });
-
+    
     // Add subtle parallax effect to hero section
-    window.addEventListener('scroll', function () {
+    window.addEventListener('scroll', function() {
         const scrollPosition = window.scrollY;
         const heroImage = document.querySelector('.hero-image img');
         if (heroImage) {
@@ -1211,355 +1081,27 @@ function setupScrollAnimations() {
 }
 
 // Keyboard navigation for accessibility
-document.addEventListener('keydown', function (e) {
+document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && recipeModal.style.display === 'block') {
         closeModal();
     }
 });
 
-// SEO Meta Tag Management Functions
-// Update meta tags for a specific recipe
-function updateMetaTags(recipe) {
-    // Update title
-    document.title = `${recipe.name} - Let's Cook Curry`;
-
-    // Update meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-        metaDescription.setAttribute('content',
-            `${recipe.name}: ${recipe.description} ${formatDiet(recipe.diet)} ${formatRegion(recipe.region)} recipe with ${recipe.prepTime + recipe.cookTime} min cooking time.`);
-    }
-
-    // Update Open Graph tags
-    updateOgTags(recipe);
-
-    // Update Twitter tags
-    updateTwitterTags(recipe);
-
-    // Add schema.org structured data
-    addRecipeSchema(recipe);
-}
-
-// Update Open Graph meta tags
-function updateOgTags(recipe) {
-    // OG Title
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-        ogTitle.setAttribute('content', `${recipe.name} - Authentic ${formatRegion(recipe.region)} Recipe`);
-    }
-
-    // OG Description
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) {
-        ogDescription.setAttribute('content',
-            `${recipe.description} Ready in ${recipe.prepTime + recipe.cookTime} minutes. ${formatDiet(recipe.diet)} recipe.`);
-    }
-
-    // OG Image
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    if (ogImage && recipe.image) {
-        ogImage.setAttribute('content', recipe.image);
-    }
-
-    // OG URL - create a shareable URL
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) {
-        const recipeSlug = recipe.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-        const url = new URL(window.location.origin + window.location.pathname);
-        url.searchParams.set('recipe', recipe.id);
-        url.searchParams.set('slug', recipeSlug);
-        ogUrl.setAttribute('content', url.toString());
-    }
-}
-
-// Update Twitter meta tags
-function updateTwitterTags(recipe) {
-    // Twitter Title
-    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-    if (twitterTitle) {
-        twitterTitle.setAttribute('content', `${recipe.name} - Authentic ${formatRegion(recipe.region)} Recipe`);
-    }
-
-    // Twitter Description
-    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
-    if (twitterDescription) {
-        twitterDescription.setAttribute('content',
-            `${recipe.description} Ready in ${recipe.prepTime + recipe.cookTime} minutes. ${formatDiet(recipe.diet)} recipe.`);
-    }
-
-    // Twitter Image
-    const twitterImage = document.querySelector('meta[property="twitter:image"]');
-    if (twitterImage && recipe.image) {
-        twitterImage.setAttribute('content', recipe.image);
-    }
-}
-
-// Add schema.org structured data for recipe
-function addRecipeSchema(recipe) {
-    // Remove any existing schema script
-    const existingSchema = document.querySelector('script[type="application/ld+json"]');
-    if (existingSchema) {
-        existingSchema.remove();
-    }
-
-    // Create schema.org Recipe structured data
-    const schemaData = {
-        "@context": "https://schema.org/",
-        "@type": "Recipe",
-        "name": recipe.name,
-        "image": recipe.image,
-        "description": recipe.description,
-        "keywords": `${formatRegion(recipe.region)}, ${formatDiet(recipe.diet)}, ${recipe.spice} spice, curry, Indian recipe`,
-        "author": {
-            "@type": "Organization",
-            "name": "Let's Cook Curry"
-        },
-        "prepTime": `PT${recipe.prepTime}M`,
-        "cookTime": `PT${recipe.cookTime}M`,
-        "totalTime": `PT${recipe.prepTime + recipe.cookTime}M`,
-        "recipeCategory": `${formatRegion(recipe.region)} ${formatDiet(recipe.diet)} Curry`,
-        "recipeCuisine": "Indian",
-        "recipeYield": `${recipe.servings} servings`,
-        "nutrition": {
-            "@type": "NutritionInformation",
-            "suitableForDiet": recipe.diet === "vegetarian" ? "VegetarianDiet" :
-                recipe.diet === "vegan" ? "VeganDiet" : ""
-        },
-        "recipeIngredient": recipe.ingredients,
-        "recipeInstructions": recipe.instructions.map((step, index) => ({
-            "@type": "HowToStep",
-            "position": index + 1,
-            "text": step
-        })),
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": recipe.rating,
-            "reviewCount": recipe.reviews
-        }
-    };
-
-    // Create and append the script element
-    const scriptElement = document.createElement('script');
-    scriptElement.type = 'application/ld+json';
-    scriptElement.text = JSON.stringify(schemaData);
-    document.head.appendChild(scriptElement);
-}
-
-// Reset meta tags to default website values
-function resetMetaTags() {
-    // Reset title
-    document.title = "Let's Cook Curry - Authentic Indian Recipes for Curry Lovers";
-
-    // Reset meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-        metaDescription.setAttribute('content',
-            'Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques. Share your own recipes with our community.');
-    }
-
-    // Reset Open Graph tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-        ogTitle.setAttribute('content', "Let's Cook Curry - Authentic Indian Recipes");
-    }
-
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) {
-        ogDescription.setAttribute('content',
-            'Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.');
-    }
-
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    if (ogImage) {
-        ogImage.setAttribute('content',
-            'https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg');
-    }
-
-    // Reset Twitter tags
-    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-    if (twitterTitle) {
-        twitterTitle.setAttribute('content', "Let's Cook Curry - Authentic Indian Recipes");
-    }
-
-    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
-    if (twitterDescription) {
-        twitterDescription.setAttribute('content',
-            'Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.');
-    }
-
-    const twitterImage = document.querySelector('meta[property="twitter:image"]');
-    if (twitterImage) {
-        twitterImage.setAttribute('content',
-            'https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg');
-    }
-
-    // Remove schema.org data
-    const existingSchema = document.querySelector('script[type="application/ld+json"]');
-    if (existingSchema) {
-        existingSchema.remove();
-    }
-}
-
-// Update meta tags for a filtered region
-function updateRegionMetaTags(region) {
-    if (!region) {
-        resetMetaTags();
-        return;
-    }
-
-    const regionName = formatRegion(region);
-
-    // Update title
-    document.title = `${regionName} Curry Recipes - Let's Cook Curry`;
-
-    // Update meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-        metaDescription.setAttribute('content',
-            `Explore authentic ${regionName} curry recipes. Find traditional dishes with detailed ingredients, instructions, and cooking tips.`);
-    }
-
-    // Update Open Graph tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-        ogTitle.setAttribute('content', `${regionName} Curry Recipes - Let's Cook Curry`);
-    }
-
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) {
-        ogDescription.setAttribute('content',
-            `Explore authentic ${regionName} curry recipes. Find traditional dishes with detailed ingredients, instructions, and cooking tips.`);
-    }
-
-    // Update Twitter tags
-    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-    if (twitterTitle) {
-        twitterTitle.setAttribute('content', `${regionName} Curry Recipes - Let's Cook Curry`);
-    }
-
-    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
-    if (twitterDescription) {
-        twitterDescription.setAttribute('content',
-            `Explore authentic ${regionName} curry recipes. Find traditional dishes with detailed ingredients, instructions, and cooking tips.`);
-    }
-}
-
-// Update meta tags based on all active filters
-function updateFilterMetaTags(regionFilter, dietFilter, spiceFilter) {
-    // If no filters active, reset to default
-    if (!regionFilter && !dietFilter && !spiceFilter) {
-        resetMetaTags();
-        return;
-    }
-
-    // Build filter description
-    const regionName = regionFilter ? formatRegion(regionFilter) : '';
-    const dietName = dietFilter ? formatDiet(dietFilter) : '';
-    const spiceName = spiceFilter ? (spiceFilter.charAt(0).toUpperCase() + spiceFilter.slice(1)) : '';
-
-    // Create filter title components
-    const titleParts = [];
-    if (regionName) titleParts.push(regionName);
-    if (dietName) titleParts.push(dietName);
-    if (spiceName) titleParts.push(spiceName + ' Spice');
-
-    const filterTitle = titleParts.join(' ') + ' Curry Recipes';
-
-    // Create filter description
-    let filterDescription = `Browse `;
-    if (regionName) filterDescription += `authentic ${regionName} `;
-    if (dietName) filterDescription += `${dietName.toLowerCase()} `;
-    if (spiceName) filterDescription += `${spiceName.toLowerCase()} spice `;
-
-    filterDescription += `curry recipes. Find detailed ingredients, instructions, and cooking tips.`;
-
-    // Update title and meta tags
-    document.title = `${filterTitle} - Let's Cook Curry`;
-
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-        metaDescription.setAttribute('content', filterDescription);
-    }
-
-    // Update Open Graph tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-        ogTitle.setAttribute('content', `${filterTitle} - Let's Cook Curry`);
-    }
-
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) {
-        ogDescription.setAttribute('content', filterDescription);
-    }
-
-    // Update Twitter tags
-    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-    if (twitterTitle) {
-        twitterTitle.setAttribute('content', `${filterTitle} - Let's Cook Curry`);
-    }
-
-    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
-    if (twitterDescription) {
-        twitterDescription.setAttribute('content', filterDescription);
-    }
-}
-
 // Add some sample recipes on page load for demonstration
-window.addEventListener('load', function () {
+window.addEventListener('load', function() {
     // This simulates recipes being loaded from a database
     console.log(`Loaded ${sampleRecipes.length} recipes from the database`);
-
+    
     // Add button hover animations
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(button => {
-        button.addEventListener('mouseenter', function () {
+        button.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-2px)';
         });
-        button.addEventListener('mouseleave', function () {
+        button.addEventListener('mouseleave', function() {
             this.style.transform = '';
         });
     });
-
-    // Check for URL parameters and hash for routing
-    const urlParams = new URLSearchParams(window.location.search);
-    const regionParam = urlParams.get('region');
-    const recipeParam = urlParams.get('recipe');
-    const hash = window.location.hash.substring(1); // Remove the # symbol
-
-    if (hash) {
-        // If a recipe slug is in the hash, find and open the recipe
-        const recipeId = getRecipeIdFromSlug(hash);
-        if (recipeId) {
-            setTimeout(() => openRecipeModal(recipeId), 500); // Slight delay to ensure DOM is ready
-        }
-    } else if (recipeParam) {
-        // Legacy support for recipe URL param
-        const recipeId = parseInt(recipeParam);
-        const recipe = allRecipes.find(r => r.id === recipeId);
-        if (recipe) {
-            setTimeout(() => openRecipeModal(recipeId), 500); // Slight delay to ensure DOM is ready
-        }
-    } else if (regionParam) {
-        updateRegionMetaTags(regionParam);
-    }
-});
-
-// Handle browser back/forward navigation
-window.addEventListener('popstate', function (event) {
-    const hash = window.location.hash.substring(1);
-
-    if (hash) {
-        // If there's a hash, open the corresponding recipe
-        const recipeId = getRecipeIdFromSlug(hash);
-        if (recipeId) {
-            openRecipeModal(recipeId);
-        }
-    } else {
-        // If no hash, close any open modal
-        if (recipeModal && recipeModal.style.display === 'block') {
-            closeModal();
-        }
-    }
 });
 
 // Load user favorites from database
@@ -1569,12 +1111,12 @@ async function loadUserFavorites() {
             .from('favorites')
             .select('recipe_id')
             .eq('user_session', userSession);
-
+            
         if (error) {
             console.error('Error loading favorites:', error);
             return;
         }
-
+        
         // Update userFavorites set with recipe IDs
         userFavorites.clear();
         if (favorites) {
@@ -1589,13 +1131,9 @@ async function loadUserFavorites() {
 async function toggleFavorite(recipeId, event) {
     event.preventDefault();
     event.stopPropagation();
-
-    const recipe = allRecipes.find(r => r.id === recipeId);
+    
     const isFavorite = userFavorites.has(recipeId);
-
-    // Track favorite action in Google Analytics
-    trackEvent('User Actions', isFavorite ? 'Remove Favorite' : 'Add Favorite', recipe ? recipe.name : `Recipe ID: ${recipeId}`);
-
+    
     try {
         if (isFavorite) {
             // Remove from favorites
@@ -1604,12 +1142,12 @@ async function toggleFavorite(recipeId, event) {
                 .delete()
                 .eq('recipe_id', recipeId)
                 .eq('user_session', userSession);
-
+                
             if (error) {
                 console.error('Error removing favorite:', error);
                 return;
             }
-
+            
             userFavorites.delete(recipeId);
         } else {
             // Add to favorites
@@ -1618,21 +1156,21 @@ async function toggleFavorite(recipeId, event) {
                 .insert([
                     { recipe_id: recipeId, user_session: userSession }
                 ]);
-
+                
             if (error) {
                 console.error('Error adding favorite:', error);
                 return;
             }
-
+            
             userFavorites.add(recipeId);
         }
-
+        
         // Update UI for all favorite buttons for this recipe
         updateFavoriteButtons(recipeId);
-
+        
         // Show feedback
         showToast(isFavorite ? 'Removed from favorites' : 'Added to favorites');
-
+        
     } catch (error) {
         console.error('Unexpected error toggling favorite:', error);
         showToast('Error updating favorites');
@@ -1643,7 +1181,7 @@ async function toggleFavorite(recipeId, event) {
 function updateFavoriteButtons(recipeId) {
     const isFavorite = userFavorites.has(recipeId);
     const favoriteButtons = document.querySelectorAll(`.btn-favorite[onclick*="${recipeId}"]`);
-
+    
     favoriteButtons.forEach(btn => {
         if (isFavorite) {
             btn.classList.add('active');
@@ -1663,26 +1201,19 @@ function updateFavoriteButtons(recipeId) {
 async function shareRecipe(recipeId, event) {
     event.preventDefault();
     event.stopPropagation();
-
+    
     const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
-
-    // Track share action in Google Analytics
-    trackEvent('User Actions', 'Share Recipe', recipe.name);
-
-    // Generate pretty URL with recipe slug for better sharing
-    const recipeSlug = generateRecipeSlug(recipe.name);
-    const shareUrl = `${window.location.origin}${window.location.pathname}#${recipeSlug}`;
-
+    
     const shareData = {
         title: `${recipe.name} - Let's Cook Curry`,
         text: `Check out this delicious ${recipe.name} recipe! ${recipe.description}`,
-        url: shareUrl
+        url: window.location.href + `#recipe-${recipeId}`
     };
-
+    
     // Check if Web Share API is supported and allowed
     const canShare = navigator.share && navigator.canShare && navigator.canShare(shareData);
-
+    
     try {
         // Try native sharing only if it's supported and we can share this data
         if (canShare) {
@@ -1733,10 +1264,10 @@ function showShareModal(recipe, shareData) {
             </div>
         </div>
     `;
-
+    
     document.body.appendChild(modal);
     modal.style.display = 'flex';
-
+    
     // Close modal when clicking outside
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -1782,12 +1313,12 @@ function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-
+    
     document.body.appendChild(toast);
-
+    
     // Trigger animation
     setTimeout(() => toast.classList.add('show'), 100);
-
+    
     // Remove toast after delay
     setTimeout(() => {
         toast.classList.remove('show');

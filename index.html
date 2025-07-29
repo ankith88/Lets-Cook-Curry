@@ -1,43 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-XXXXXXXXXX');
-    </script>
-    <!-- End Google Analytics -->
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Let's Cook Curry - Authentic Indian Recipes for Curry Lovers</title>
     <meta name="description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques. Share your own recipes with our community.">
-    <!-- Primary Meta Tags -->
-    <meta name="title" content="Let's Cook Curry - Authentic Indian Recipes for Curry Lovers">
-    <meta name="keywords" content="Indian recipes, curry recipes, authentic Indian food, Indian cooking, homemade curry">
-    <meta name="author" content="Let's Cook Curry">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://letscookcurry.com/">
-    <meta property="og:title" content="Let's Cook Curry - Authentic Indian Recipes">
-    <meta property="og:description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.">
-    <meta property="og:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Let's Cook Curry">
-    <meta property="og:locale" content="en_US">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://letscookcurry.com/">
-    <meta property="twitter:title" content="Let's Cook Curry - Authentic Indian Recipes">
-    <meta property="twitter:description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.">
-    <meta property="twitter:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
-    
     <link rel="icon" type="image/png" sizes="32x32" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
     <link rel="apple-touch-icon" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
@@ -48,46 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Schema.org WebSite data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Let's Cook Curry",
-        "url": "https://letscookcurry.com",
-        "description": "Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://letscookcurry.com/?search={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
-    
-    <!-- Schema.org Organization data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Let's Cook Curry",
-        "url": "https://letscookcurry.com",
-        "logo": "https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png",
-        "description": "Let's Cook Curry shares authentic Indian recipes, cooking techniques, and culinary traditions with home cooks worldwide.",
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Sydney",
-            "addressRegion": "NSW",
-            "addressCountry": "Australia"
-        },
-        "sameAs": [
-            "https://facebook.com/letscookcurry",
-            "https://instagram.com/letscookcurry",
-            "https://pinterest.com/letscookcurry",
-            "https://youtube.com/c/letscookcurry"
-        ]
-    }
-    </script>
 </head>
 <body>
     <header class="header">
@@ -131,17 +58,6 @@
         <section class="filters" id="recipes">
             <div class="container">
                 <h3>Find Your Perfect Curry</h3>
-                <div class="search-bar">
-                    <div class="search-input-group">
-                        <input type="text" id="search-input" class="search-input" placeholder="Search recipes by name or ingredients..." />
-                        <button class="search-button" onclick="performSearch()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.35-4.35"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
                 <div class="filter-grid">
                     <div class="filter-group">
                         <label for="region-filter">Region</label>
