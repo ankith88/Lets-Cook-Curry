@@ -1,10 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    <!-- End Google Analytics -->
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Let's Cook Curry</title>
     <meta name="description" content="Meet Tanvi and Ankith, the passionate couple behind Let's Cook Curry, dedicated to sharing authentic Indian recipes and culinary traditions.">
+    <meta name="keywords" content="Let's Cook Curry, about us, Indian cooking, curry recipes, food blog, cooking blog, Indian food">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://letscookcurry.com/about.html">
+    <meta property="og:title" content="About Us - Let's Cook Curry">
+    <meta property="og:description" content="Meet Tanvi and Ankith, the passionate couple behind Let's Cook Curry, dedicated to sharing authentic Indian recipes and culinary traditions.">
+    <meta property="og:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://letscookcurry.com/about.html">
+    <meta property="twitter:title" content="About Us - Let's Cook Curry">
+    <meta property="twitter:description" content="Meet Tanvi and Ankith, the passionate couple behind Let's Cook Curry, dedicated to sharing authentic Indian recipes and culinary traditions.">
+    <meta property="twitter:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
+    
     <link rel="icon" type="image/png" sizes="32x32" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
     <link rel="apple-touch-icon" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
@@ -113,31 +139,7 @@
             margin: var(--spacing-xl) 0;
         }
 
-        .values-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: var(--spacing-lg);
-            margin-top: var(--spacing-xl);
-            padding: var(--spacing-lg);
-            background: var(--color-background-alt);
-            border-radius: var(--border-radius-lg);
-        }
 
-        .value-card {
-            text-align: center;
-            padding: var(--spacing-md);
-        }
-
-        .value-card i {
-            font-size: 2.5rem;
-            color: var(--color-primary);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .value-card h3 {
-            margin-bottom: var(--spacing-sm);
-            font-weight: 600;
-        }
 
         @media (max-width: 768px) {
             .about-hero h1 {
@@ -149,6 +151,28 @@
             }
         }
     </style>
+    
+    <!-- Schema.org Organization data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Let's Cook Curry",
+        "url": "https://letscookcurry.com",
+        "logo": "https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png",
+        "description": "Let's Cook Curry shares authentic Indian recipes, cooking techniques, and culinary traditions with home cooks worldwide.",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Sydney",
+            "addressRegion": "NSW",
+            "addressCountry": "Australia"
+        },
+        "sameAs": [
+            "https://facebook.com/letscookcurry",
+            "https://instagram.com/letscookcurry"
+        ]
+    }
+    </script>
 </head>
 <body>
     <header class="header">
@@ -156,14 +180,13 @@
             <div class="nav-brand">
                 <a href="index.html">
                     <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="logo">
-                    <span class="brand-text">Let's Cook Curry</span>
                 </a>
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="index.html#recipes" class="nav-link">Recipes</a></li>
                 <li><a href="about.html" class="nav-link active">About Us</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
             <button class="nav-toggle" aria-label="Toggle navigation">
                 <span></span>
@@ -197,24 +220,6 @@
                     <p>Thank you for being here. We're so excited to have you join our community. We hope our recipes bring as much warmth and happiness to your table as they do to ours.</p>
                     
                     <div class="signature">Happy cooking!</div>
-                    
-                    <div class="values-section">
-                        <div class="value-card">
-                            <i class="fas fa-heart"></i>
-                            <h3>Authenticity</h3>
-                            <p>We honor traditional recipes while making them accessible to modern home cooks.</p>
-                        </div>
-                        <div class="value-card">
-                            <i class="fas fa-users"></i>
-                            <h3>Community</h3>
-                            <p>We believe in the power of food to bring people together across cultures and generations.</p>
-                        </div>
-                        <div class="value-card">
-                            <i class="fas fa-book-open"></i>
-                            <h3>Education</h3>
-                            <p>We're passionate about sharing our knowledge and helping others discover the joy of Indian cooking.</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -235,9 +240,9 @@
                             <h4>Explore</h4>
                             <ul>
                                 <li><a href="index.html">Home</a></li>
-                                <li><a href="index.html#recipes">All Recipes</a></li>
+                                <li><a href="#recipes">All Recipes</a></li>
                                 <li><a href="about.html">About Us</a></li>
-                                <li><a href="index.html#contact">Contact</a></li>
+                                <li><a href="contact.html">Contact</a></li>
                             </ul>
                         </div>
                         
@@ -297,7 +302,7 @@
                 });
             }, { threshold: 0.1 });
 
-            document.querySelectorAll('section, .value-card').forEach(el => {
+            document.querySelectorAll('section').forEach(el => {
                 el.classList.add('fade-in');
                 observer.observe(el);
             });

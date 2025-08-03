@@ -1,0 +1,377 @@
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    <!-- End Google Analytics -->
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Let's Cook Curry</title>
+    <meta name="description" content="Get in touch with the Let's Cook Curry team. Send us your questions, recipe suggestions, or comments - we'd love to hear from you!">
+    <meta name="keywords" content="Let's Cook Curry, contact us, food blog, curry recipes, recipe suggestions, feedback">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://letscookcurry.com/contact.html">
+    <meta property="og:title" content="Contact Us - Let's Cook Curry">
+    <meta property="og:description" content="Get in touch with the Let's Cook Curry team. Send us your questions, recipe suggestions, or comments - we'd love to hear from you!">
+    <meta property="og:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://letscookcurry.com/contact.html">
+    <meta property="twitter:title" content="Contact Us - Let's Cook Curry">
+    <meta property="twitter:description" content="Get in touch with the Let's Cook Curry team. Send us your questions, recipe suggestions, or comments - we'd love to hear from you!">
+    <meta property="twitter:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="apple-touch-icon" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Additional styles specific to the Contact page */
+        .contact-hero {
+            background: linear-gradient(135deg, rgba(247, 168, 50, 0.05) 0%, rgba(77, 99, 44, 0.05) 100%);
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-hero .subtitle {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-section {
+            padding: var(--spacing-xl) 0;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--color-background);
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        .contact-info {
+            padding: var(--spacing-lg);
+            background-color: var(--color-background-alt);
+            border-radius: var(--border-radius-lg);
+        }
+
+        .contact-info h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--color-accent);
+            font-size: 1.5rem;
+        }
+
+        .contact-info p {
+            margin-bottom: var(--spacing-md);
+            line-height: 1.6;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .contact-method i {
+            margin-right: var(--spacing-sm);
+            color: var(--color-primary);
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .contact-form {
+            padding: var(--spacing-lg);
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(247, 168, 50, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .social-links {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            justify-content: center;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--color-background);
+            border-radius: var(--border-radius-circle);
+            color: var(--color-accent);
+            transition: all 0.3s ease;
+            font-size: 1.25rem;
+        }
+
+        .social-link:hover {
+            background-color: var(--color-accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .contact-hero .subtitle {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="index.html">
+                    <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="logo">
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#recipes" class="nav-link">Recipes</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link active">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Contact Hero Section -->
+        <section class="contact-hero">
+            <div class="container">
+                <h1>Contact Us</h1>
+                <div class="subtitle">We'd Love to Hear from You</div>
+            </div>
+        </section>
+
+        <!-- Contact Content Section -->
+        <section class="contact-section">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <p>Have a question about a recipe? Want to suggest a new dish? Or perhaps you just want to say hello? We'd love to hear from you!</p>
+                    
+                    <div class="contact-method">
+                        <i class="fas fa-envelope"></i>
+                        <span>ankith88@gmail.com</span>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Sydney, Australia</span>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <i class="fas fa-clock"></i>
+                        <span>Response time: 24-48 hours</span>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="https://facebook.com/letscookcurry" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://instagram.com/letscookcurry" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form id="contact-form" action="mailto:ankith88@gmail.com" method="post" enctype="text/plain">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" name="message" class="form-control" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-brand">
+                        <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="footer-logo">
+                        <h3>Let's Cook Curry</h3>
+                        <p>From our kitchen in Sydney to yours, we share a passion for authentic Indian food. Find simple recipes and bring the warmth of homemade curry to your table.</p>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <div class="footer-section">
+                            <h4>Explore</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="#recipes">All Recipes</a></li>
+                                <li><a href="about.html">About Us</a></li>
+                                <li><a href="contact.html">Contact</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="footer-section">
+                            <h4>Recipes by Region</h4>
+                            <ul>
+                                <li><a href="index.html?region=north" data-filter="north">North Indian</a></li>
+                                <li><a href="index.html?region=south" data-filter="south">South Indian</a></li>
+                                <li><a href="index.html?region=east" data-filter="east">East Indian</a></li>
+                                <li><a href="index.html?region=west" data-filter="west">West Indian</a></li>
+                            </ul>
+                        </div>
+                        
+
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <div class="footer-divider"></div>
+                    <div class="footer-bottom-content">
+                        <p>&copy; 2024 Let's Cook Curry. Made with ❤️ for curry lovers everywhere.</p>
+                        <p class="footer-tagline">"Where every spice tells a story, and every dish carries tradition."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="script.js"></script>
+    <script>
+        // Initialize mobile navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMobileNav();
+            
+            // Form submission event
+            document.getElementById('contact-form').addEventListener('submit', function(e) {
+                // Track form submission in Google Analytics if available
+                if (typeof gtag === 'function') {
+                    gtag('event', 'form_submission', {
+                        'event_category': 'Contact',
+                        'event_label': 'Contact Form'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

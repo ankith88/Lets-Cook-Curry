@@ -1,3 +1,13 @@
+// Google Analytics Event Tracking
+function trackEvent(eventCategory, eventAction, eventLabel) {
+    if (window.gtag) {
+        gtag('event', eventAction, {
+            'event_category': eventCategory,
+            'event_label': eventLabel
+        });
+    }
+}
+
 // Supabase configuration
 const SUPABASE_URL = 'https://uifwtvqgiwuttnanxyvz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpZnd0dnFnaXd1dHRuYW54eXZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMDgwNjMsImV4cCI6MjA2ODU4NDA2M30.gok42F8kyYq1Ain5IGFZzElyR-j0_Djlcw2Ea0gd4N0';
@@ -266,13 +276,18 @@ function generateUserSession() {
 // Store user's favorite recipe IDs
 let userFavorites = new Set();
 
-// DOM elements
-const recipeGrid = document.getElementById('recipe-grid');
-const recipeModal = document.getElementById('recipe-modal');
-const modalBody = document.getElementById('modal-body');
+// DOM elements - will initialize them inside DOMContentLoaded to ensure they exist
+let recipeGrid;
+let recipeModal;
+let modalBody;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize DOM elements after the document is loaded
+    recipeGrid = document.getElementById('recipe-grid');
+    recipeModal = document.getElementById('recipe-modal');
+    modalBody = document.getElementById('modal-body');
+    
     // Add slide-up animation to sections
     document.querySelectorAll('section').forEach((section, index) => {
         section.classList.add('fade-in');
@@ -282,24 +297,30 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize mobile navigation
     initializeMobileNav();
     
-    // Load user favorites first
-    await loadUserFavorites();
-    
-    // Load recipes from Supabase
-    await loadRecipesFromSupabase();
-    
-    // Check for filter parameters in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const regionParam = urlParams.get('region');
-    if (regionParam) {
-        applyFilters(regionParam);
-    } else {
-        // Display initial recipes with no filters
-        displayRecipes();
+    // Only proceed with recipe loading if we're on a page with recipe grid
+    if (recipeGrid) {
+        // Load user favorites first
+        await loadUserFavorites();
+        
+        // Load recipes from Supabase
+        await loadRecipesFromSupabase();
+        
+        // Check for filter parameters in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const regionParam = urlParams.get('region');
+        if (regionParam) {
+            applyFilters(regionParam);
+        } else {
+            // Display initial recipes with no filters
+            displayRecipes();
+        }
     }
     
     // Initialize region filtering links
     initializeRegionLinks();
+    
+    // Initialize search functionality
+    initializeSearch();
     
     // Setup scroll animations
     setupScrollAnimations();
@@ -308,8 +329,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Load recipes from Supabase
 async function loadRecipesFromSupabase() {
     try {
-        // Show loading state
-        recipeGrid.innerHTML = '<div class="loading">Loading recipes...</div>';
+        // Check if recipeGrid exists before manipulating it
+        if (recipeGrid) {
+            // Show loading state
+            recipeGrid.innerHTML = '<div class="loading">Loading recipes...</div>';
+        }
         
         // Fetch recipes from Supabase
         const { data: recipes, error } = await supabase
@@ -370,13 +394,21 @@ async function loadRecipesFromSupabase() {
         allRecipes = [...sampleRecipes];
         currentRecipes = [...sampleRecipes];
     } finally {
-        // Clear loading state
-        recipeGrid.innerHTML = '';
+        // Clear loading state only if recipeGrid exists
+        if (recipeGrid) {
+            recipeGrid.innerHTML = '';
+        }
     }
 }
 
 // Display recipes in the grid
 function displayRecipes() {
+    // Check if recipeGrid exists before trying to append to it
+    if (!recipeGrid) {
+        console.warn('Recipe grid element not found - cannot display recipes');
+        return;
+    }
+    
     const recipesToShow = currentRecipes.slice(displayedRecipes, displayedRecipes + recipesPerPage);
     
     recipesToShow.forEach(recipe => {
@@ -472,36 +504,141 @@ function formatDiet(diet) {
     return diets[diet] || diet;
 }
 
-// Apply filters to recipes
+// Initialize search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('search-input');
+    
+    // Real-time search as user types
+    searchInput.addEventListener('input', () => applyFilters());
+    
+    // Search on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    
+    // Filter dropdown event listeners  
+    document.getElementById('region-filter').addEventListener('change', () => applyFilters());
+    document.getElementById('diet-filter').addEventListener('change', () => applyFilters());
+    document.getElementById('spice-filter').addEventListener('change', () => applyFilters());
+}
+
+// Search functionality
+function performSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    if (searchTerm) {
+        trackEvent('Search', 'Recipe Search', searchTerm);
+    }
+    
+    applyFilters();
+}
+
+// Apply filters and search to recipes
 function applyFilters(regionOverride) {
-    const regionFilter = regionOverride || document.getElementById('region-filter').value;
-    const dietFilter = document.getElementById('diet-filter').value;
-    const spiceFilter = document.getElementById('spice-filter').value;
+    // Check if filter elements exist
+    const regionFilterElement = document.getElementById('region-filter');
+    const dietFilterElement = document.getElementById('diet-filter');
+    const spiceFilterElement = document.getElementById('spice-filter');
+    const searchInputElement = document.getElementById('search-input');
+    const recipesElement = document.getElementById('recipes');
+    
+    // If elements don't exist, this might be running on a different page
+    if (!regionFilterElement || !dietFilterElement || !spiceFilterElement) {
+        console.warn('Filter elements not found - skipping filter application');
+        return;
+    }
+    
+    // Get filter values
+    const regionFilter = regionOverride || regionFilterElement.value;
+    const dietFilter = dietFilterElement.value;
+    const spiceFilter = spiceFilterElement.value;
+    const searchTerm = searchInputElement ? searchInputElement.value.toLowerCase().trim() : '';
+    
+    // Track filter usage in Google Analytics
+    if (regionFilter !== 'all') {
+        trackEvent('Filters', 'Region Filter', regionFilter);
+    }
+    if (dietFilter !== 'all') {
+        trackEvent('Filters', 'Diet Filter', dietFilter);
+    }
+    if (spiceFilter !== 'all') {
+        trackEvent('Filters', 'Spice Filter', spiceFilter);
+    }
     
     // Update the region filter dropdown to match the override (if any)
-    if (regionOverride) {
-        const regionSelect = document.getElementById('region-filter');
-        regionSelect.value = regionOverride;
+    if (regionOverride && regionFilterElement) {
+        regionFilterElement.value = regionOverride;
     }
     
     currentRecipes = allRecipes.filter(recipe => {
-        return (!regionFilter || recipe.region === regionFilter) &&
-               (!dietFilter || recipe.diet === dietFilter) &&
-               (!spiceFilter || recipe.spice === spiceFilter);
+        // Filter by region, diet, and spice level
+        const regionMatch = !regionFilter || recipe.region === regionFilter;
+        const dietMatch = !dietFilter || recipe.diet === dietFilter;
+        const spiceMatch = !spiceFilter || recipe.spice === spiceFilter;
+        
+        // Search functionality - search in recipe name and ingredients
+        let searchMatch = true;
+        if (searchTerm) {
+            const nameMatch = recipe.name.toLowerCase().includes(searchTerm);
+            const ingredientMatch = recipe.ingredients.some(ingredient => 
+                ingredient.toLowerCase().includes(searchTerm)
+            );
+            searchMatch = nameMatch || ingredientMatch;
+        }
+        
+        return regionMatch && dietMatch && spiceMatch && searchMatch;
     });
     
-    // Reset display
-    recipeGrid.innerHTML = '';
-    displayedRecipes = 0;
-    displayRecipes();
+    // Reset display if recipeGrid exists
+    if (recipeGrid) {
+        recipeGrid.innerHTML = '';
+        displayedRecipes = 0;
+        displayRecipes();
+    }
     
-    // Scroll to results
-    document.getElementById('recipes').scrollIntoView({ behavior: 'smooth' });
+    // Update meta tags based on filters
+    updateFilterMetaTags(regionFilter, dietFilter, spiceFilter);
+    
+    // Scroll to results if element exists
+    if (recipesElement) {
+        recipesElement.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // Load more recipes
 function loadMoreRecipes() {
     displayRecipes();
+}
+
+// Generate URL-friendly slug from recipe name
+function generateRecipeSlug(recipeName) {
+    return recipeName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+        .trim()
+        .replace(/\s+/g, '-'); // Replace spaces with dashes
+}
+
+// Get recipe ID from slug
+function getRecipeIdFromSlug(slug) {
+    const recipe = allRecipes.find(r => generateRecipeSlug(r.name) === slug);
+    return recipe ? recipe.id : null;
+}
+
+// Get recipe slug from ID
+function getRecipeSlugFromId(recipeId) {
+    const recipe = allRecipes.find(r => r.id === recipeId);
+    return recipe ? generateRecipeSlug(recipe.name) : null;
+}
+
+// Update browser URL without page reload
+function updateURL(recipeName) {
+    const slug = generateRecipeSlug(recipeName);
+    const newURL = `${window.location.origin}${window.location.pathname}#${slug}`;
+    window.history.pushState({ recipeSlug: slug }, '', newURL);
 }
 
 // Open recipe modal
@@ -510,10 +647,19 @@ async function openRecipeModal(recipeId) {
     if (!recipe) return;
     const spiceIcons = '🌶️'.repeat(getSpiceLevel(recipe.spice));
     
+    // Track recipe view in Google Analytics
+    trackEvent('Recipes', 'View', recipe.name);
+    
+    // Update URL with recipe slug
+    updateURL(recipe.name);
+    
     // Show loading state in modal
     modalBody.innerHTML = '<div class="loading">Loading recipe details...</div>';
     recipeModal.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    
+    // Update page meta tags for SEO
+    updateMetaTags(recipe);
     
     // Add animation classes after a short delay
     setTimeout(() => {
@@ -598,7 +744,7 @@ async function openRecipeModal(recipeId) {
             
             ${recipe.story ? `
                 <div class="story-section">
-                    <h3 class="section-title">Story Behind the Recipe</h3>
+                    <h3 class="section-title">About This Recipe</h3>
                     <p style="font-style: italic; color: var(--color-text-light); margin-bottom: var(--spacing-lg);">${recipe.story}</p>
                 </div>
             ` : ''}
@@ -705,10 +851,16 @@ function formatDate(dateString) {
 function closeModal() {
     recipeModal.classList.remove('show');
     
+    // Reset URL to main page
+    window.history.pushState({}, '', `${window.location.origin}${window.location.pathname}`);
+    
     // Wait for the animation to complete before hiding the modal
     setTimeout(() => {
         recipeModal.style.display = 'none';
         document.body.style.overflow = 'auto';
+        
+        // Reset meta tags to default website tags
+        resetMetaTags();
     }, 300);
 }
 
@@ -881,6 +1033,12 @@ function initializeReviewSystem(recipeId) {
         const rating = parseInt(document.getElementById('review-rating').value);
         
         if (name && reviewText && rating) {
+            // Track review submission in Google Analytics
+            const recipe = allRecipes.find(r => r.id === recipeId);
+            if (recipe) {
+                trackEvent('User Actions', 'Submit Review', `${recipe.name} (${rating} stars)`);
+            }
+            
             // Disable submit button and show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
             submitBtn.textContent = 'Submitting...';
@@ -1030,6 +1188,9 @@ function initializeRegionLinks() {
                 const url = new URL(window.location);
                 url.searchParams.set('region', region);
                 window.history.pushState({}, '', url);
+                
+                // Update meta tags for the filtered region
+                updateRegionMetaTags(region);
             });
         }
     });
@@ -1087,6 +1248,309 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// SEO Meta Tag Management Functions
+// Update meta tags for a specific recipe
+function updateMetaTags(recipe) {
+    // Update title
+    document.title = `${recipe.name} - Let's Cook Curry`;
+    
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+        metaDescription.setAttribute('content', 
+            `${recipe.name}: ${recipe.description} ${formatDiet(recipe.diet)} ${formatRegion(recipe.region)} recipe with ${recipe.prepTime + recipe.cookTime} min cooking time.`);
+    }
+    
+    // Update Open Graph tags
+    updateOgTags(recipe);
+    
+    // Update Twitter tags
+    updateTwitterTags(recipe);
+    
+    // Add schema.org structured data
+    addRecipeSchema(recipe);
+}
+
+// Update Open Graph meta tags
+function updateOgTags(recipe) {
+    // OG Title
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+        ogTitle.setAttribute('content', `${recipe.name} - Authentic ${formatRegion(recipe.region)} Recipe`);
+    }
+    
+    // OG Description
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+        ogDescription.setAttribute('content', 
+            `${recipe.description} Ready in ${recipe.prepTime + recipe.cookTime} minutes. ${formatDiet(recipe.diet)} recipe.`);
+    }
+    
+    // OG Image
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage && recipe.image) {
+        ogImage.setAttribute('content', recipe.image);
+    }
+    
+    // OG URL - create a shareable URL
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) {
+        const recipeSlug = recipe.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        const url = new URL(window.location.origin + window.location.pathname);
+        url.searchParams.set('recipe', recipe.id);
+        url.searchParams.set('slug', recipeSlug);
+        ogUrl.setAttribute('content', url.toString());
+    }
+}
+
+// Update Twitter meta tags
+function updateTwitterTags(recipe) {
+    // Twitter Title
+    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    if (twitterTitle) {
+        twitterTitle.setAttribute('content', `${recipe.name} - Authentic ${formatRegion(recipe.region)} Recipe`);
+    }
+    
+    // Twitter Description
+    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
+    if (twitterDescription) {
+        twitterDescription.setAttribute('content', 
+            `${recipe.description} Ready in ${recipe.prepTime + recipe.cookTime} minutes. ${formatDiet(recipe.diet)} recipe.`);
+    }
+    
+    // Twitter Image
+    const twitterImage = document.querySelector('meta[property="twitter:image"]');
+    if (twitterImage && recipe.image) {
+        twitterImage.setAttribute('content', recipe.image);
+    }
+}
+
+// Add schema.org structured data for recipe
+function addRecipeSchema(recipe) {
+    // Remove any existing schema script
+    const existingSchema = document.querySelector('script[type="application/ld+json"]');
+    if (existingSchema) {
+        existingSchema.remove();
+    }
+    
+    // Create schema.org Recipe structured data
+    const schemaData = {
+        "@context": "https://schema.org/",
+        "@type": "Recipe",
+        "name": recipe.name,
+        "image": recipe.image,
+        "description": recipe.description,
+        "keywords": `${formatRegion(recipe.region)}, ${formatDiet(recipe.diet)}, ${recipe.spice} spice, curry, Indian recipe`,
+        "author": {
+            "@type": "Organization",
+            "name": "Let's Cook Curry"
+        },
+        "prepTime": `PT${recipe.prepTime}M`,
+        "cookTime": `PT${recipe.cookTime}M`,
+        "totalTime": `PT${recipe.prepTime + recipe.cookTime}M`,
+        "recipeCategory": `${formatRegion(recipe.region)} ${formatDiet(recipe.diet)} Curry`,
+        "recipeCuisine": "Indian",
+        "recipeYield": `${recipe.servings} servings`,
+        "nutrition": {
+            "@type": "NutritionInformation",
+            "suitableForDiet": recipe.diet === "vegetarian" ? "VegetarianDiet" : 
+                               recipe.diet === "vegan" ? "VeganDiet" : ""
+        },
+        "recipeIngredient": recipe.ingredients,
+        "recipeInstructions": recipe.instructions.map((step, index) => ({
+            "@type": "HowToStep",
+            "position": index + 1,
+            "text": step
+        })),
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": recipe.rating,
+            "reviewCount": recipe.reviews
+        }
+    };
+    
+    // Create and append the script element
+    const scriptElement = document.createElement('script');
+    scriptElement.type = 'application/ld+json';
+    scriptElement.text = JSON.stringify(schemaData);
+    document.head.appendChild(scriptElement);
+}
+
+// Reset meta tags to default website values
+function resetMetaTags() {
+    // Safety check for document object
+    if (typeof document === 'undefined') {
+        console.warn('Document object not available for meta tag updates');
+        return;
+    }
+    
+    try {
+        // Reset title
+        document.title = "Let's Cook Curry - Authentic Indian Recipes for Curry Lovers";
+        
+        // Reset meta description
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+            metaDescription.setAttribute('content', 
+                'Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques. Share your own recipes with our community.');
+        }
+    } catch (error) {
+        console.error('Error resetting meta tags:', error);
+    }
+    
+    // Reset Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+        ogTitle.setAttribute('content', "Let's Cook Curry - Authentic Indian Recipes");
+    }
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+        ogDescription.setAttribute('content', 
+            'Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.');
+    }
+    
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage) {
+        ogImage.setAttribute('content', 
+            'https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg');
+    }
+    
+    // Reset Twitter tags
+    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    if (twitterTitle) {
+        twitterTitle.setAttribute('content', "Let's Cook Curry - Authentic Indian Recipes");
+    }
+    
+    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
+    if (twitterDescription) {
+        twitterDescription.setAttribute('content', 
+            'Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.');
+    }
+    
+    const twitterImage = document.querySelector('meta[property="twitter:image"]');
+    if (twitterImage) {
+        twitterImage.setAttribute('content', 
+            'https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg');
+    }
+    
+    // Remove schema.org data
+    const existingSchema = document.querySelector('script[type="application/ld+json"]');
+    if (existingSchema) {
+        existingSchema.remove();
+    }
+}
+
+// Update meta tags for a filtered region
+function updateRegionMetaTags(region) {
+    if (!region) {
+        resetMetaTags();
+        return;
+    }
+    
+    const regionName = formatRegion(region);
+    
+    // Update title
+    document.title = `${regionName} Curry Recipes - Let's Cook Curry`;
+    
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+        metaDescription.setAttribute('content', 
+            `Explore authentic ${regionName} curry recipes. Find traditional dishes with detailed ingredients, instructions, and cooking tips.`);
+    }
+    
+    // Update Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+        ogTitle.setAttribute('content', `${regionName} Curry Recipes - Let's Cook Curry`);
+    }
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+        ogDescription.setAttribute('content', 
+            `Explore authentic ${regionName} curry recipes. Find traditional dishes with detailed ingredients, instructions, and cooking tips.`);
+    }
+    
+    // Update Twitter tags
+    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    if (twitterTitle) {
+        twitterTitle.setAttribute('content', `${regionName} Curry Recipes - Let's Cook Curry`);
+    }
+    
+    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
+    if (twitterDescription) {
+        twitterDescription.setAttribute('content', 
+            `Explore authentic ${regionName} curry recipes. Find traditional dishes with detailed ingredients, instructions, and cooking tips.`);
+    }
+}
+
+// Update meta tags based on all active filters
+function updateFilterMetaTags(regionFilter, dietFilter, spiceFilter) {
+    // Safety check for document object
+    if (typeof document === 'undefined') {
+        console.warn('Document object not available for meta tag updates');
+        return;
+    }
+    
+    // If no filters active, reset to default
+    if (!regionFilter && !dietFilter && !spiceFilter) {
+        resetMetaTags();
+        return;
+    }
+    
+    // Build filter description
+    const regionName = regionFilter ? formatRegion(regionFilter) : '';
+    const dietName = dietFilter ? formatDiet(dietFilter) : '';
+    const spiceName = spiceFilter ? (spiceFilter.charAt(0).toUpperCase() + spiceFilter.slice(1)) : '';
+    
+    // Create filter title components
+    const titleParts = [];
+    if (regionName) titleParts.push(regionName);
+    if (dietName) titleParts.push(dietName);
+    if (spiceName) titleParts.push(spiceName + ' Spice');
+    
+    const filterTitle = titleParts.join(' ') + ' Curry Recipes';
+    
+    // Create filter description
+    let filterDescription = `Browse `;
+    if (regionName) filterDescription += `authentic ${regionName} `;
+    if (dietName) filterDescription += `${dietName.toLowerCase()} `;
+    if (spiceName) filterDescription += `${spiceName.toLowerCase()} spice `;
+    
+    filterDescription += `curry recipes. Find detailed ingredients, instructions, and cooking tips.`;
+    
+    // Update title and meta tags
+    document.title = `${filterTitle} - Let's Cook Curry`;
+    
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+        metaDescription.setAttribute('content', filterDescription);
+    }
+    
+    // Update Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+        ogTitle.setAttribute('content', `${filterTitle} - Let's Cook Curry`);
+    }
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+        ogDescription.setAttribute('content', filterDescription);
+    }
+    
+    // Update Twitter tags
+    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    if (twitterTitle) {
+        twitterTitle.setAttribute('content', `${filterTitle} - Let's Cook Curry`);
+    }
+    
+    const twitterDescription = document.querySelector('meta[property="twitter:description"]');
+    if (twitterDescription) {
+        twitterDescription.setAttribute('content', filterDescription);
+    }
+}
+
 // Add some sample recipes on page load for demonstration
 window.addEventListener('load', function() {
     // This simulates recipes being loaded from a database
@@ -1102,6 +1566,47 @@ window.addEventListener('load', function() {
             this.style.transform = '';
         });
     });
+    
+    // Check for URL parameters and hash for routing
+    const urlParams = new URLSearchParams(window.location.search);
+    const regionParam = urlParams.get('region');
+    const recipeParam = urlParams.get('recipe');
+    const hash = window.location.hash.substring(1); // Remove the # symbol
+    
+    if (hash) {
+        // If a recipe slug is in the hash, find and open the recipe
+        const recipeId = getRecipeIdFromSlug(hash);
+        if (recipeId) {
+            setTimeout(() => openRecipeModal(recipeId), 500); // Slight delay to ensure DOM is ready
+        }
+    } else if (recipeParam) {
+        // Legacy support for recipe URL param
+        const recipeId = parseInt(recipeParam);
+        const recipe = allRecipes.find(r => r.id === recipeId);
+        if (recipe) {
+            setTimeout(() => openRecipeModal(recipeId), 500); // Slight delay to ensure DOM is ready
+        }
+    } else if (regionParam) {
+        updateRegionMetaTags(regionParam);
+    }
+});
+
+// Handle browser back/forward navigation
+window.addEventListener('popstate', function(event) {
+    const hash = window.location.hash.substring(1);
+    
+    if (hash) {
+        // If there's a hash, open the corresponding recipe
+        const recipeId = getRecipeIdFromSlug(hash);
+        if (recipeId) {
+            openRecipeModal(recipeId);
+        }
+    } else {
+        // If no hash, close any open modal
+        if (recipeModal && recipeModal.style.display === 'block') {
+            closeModal();
+        }
+    }
 });
 
 // Load user favorites from database
@@ -1132,7 +1637,11 @@ async function toggleFavorite(recipeId, event) {
     event.preventDefault();
     event.stopPropagation();
     
+    const recipe = allRecipes.find(r => r.id === recipeId);
     const isFavorite = userFavorites.has(recipeId);
+    
+    // Track favorite action in Google Analytics
+    trackEvent('User Actions', isFavorite ? 'Remove Favorite' : 'Add Favorite', recipe ? recipe.name : `Recipe ID: ${recipeId}`);
     
     try {
         if (isFavorite) {
@@ -1205,10 +1714,17 @@ async function shareRecipe(recipeId, event) {
     const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
     
+    // Track share action in Google Analytics
+    trackEvent('User Actions', 'Share Recipe', recipe.name);
+    
+    // Generate pretty URL with recipe slug for better sharing
+    const recipeSlug = generateRecipeSlug(recipe.name);
+    const shareUrl = `${window.location.origin}${window.location.pathname}#${recipeSlug}`;
+    
     const shareData = {
         title: `${recipe.name} - Let's Cook Curry`,
         text: `Check out this delicious ${recipe.name} recipe! ${recipe.description}`,
-        url: window.location.href + `#recipe-${recipeId}`
+        url: shareUrl
     };
     
     // Check if Web Share API is supported and allowed

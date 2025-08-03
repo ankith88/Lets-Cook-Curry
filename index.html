@@ -1,47 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    <!-- End Google Analytics -->
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv='cache-control' content='no-cache'>
-    <meta http-equiv='expires' content='0'>
-    <meta http-equiv='pragma' content='no-cache'>
     <title>Let's Cook Curry - Authentic Indian Recipes for Curry Lovers</title>
-    <meta name="description"
-        content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques. Share your own recipes with our community.">
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
-    <link rel="icon" type="image/png" sizes="16x16"
-        href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
-    <link rel="apple-touch-icon"
-        href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <meta name="description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques. Share your own recipes with our community.">
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Let's Cook Curry - Authentic Indian Recipes for Curry Lovers">
+    <meta name="keywords" content="Indian recipes, curry recipes, authentic Indian food, Indian cooking, homemade curry">
+    <meta name="author" content="Let's Cook Curry">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://letscookcurry.com/">
+    <meta property="og:title" content="Let's Cook Curry - Authentic Indian Recipes">
+    <meta property="og:description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.">
+    <meta property="og:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Let's Cook Curry">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://letscookcurry.com/">
+    <meta property="twitter:title" content="Let's Cook Curry - Authentic Indian Recipes">
+    <meta property="twitter:description" content="Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.">
+    <meta property="twitter:image" content="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
+    <link rel="apple-touch-icon" href="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Schema.org WebSite data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Let's Cook Curry",
+        "url": "https://letscookcurry.com",
+        "description": "Discover authentic Indian curry recipes from all regions. Browse by dietary restrictions, spice levels, and cooking techniques.",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://letscookcurry.com/?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    
+    <!-- Schema.org Organization data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Let's Cook Curry",
+        "url": "https://letscookcurry.com",
+        "logo": "https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png",
+        "description": "Let's Cook Curry shares authentic Indian recipes, cooking techniques, and culinary traditions with home cooks worldwide.",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Sydney",
+            "addressRegion": "NSW",
+            "addressCountry": "Australia"
+        },
+        "sameAs": [
+            "https://facebook.com/letscookcurry",
+            "https://instagram.com/letscookcurry"
+        ]
+    }
+    </script>
 </head>
-
 <body>
     <header class="header">
         <nav class="nav">
             <div class="nav-brand">
                 <a href="index.html">
-                    <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png"
-                        alt="Let's Cook Curry Logo" class="logo">
-                    <span class="brand-text">Let's Cook Curry</span>
+                    <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="logo">
                 </a>
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link active">Home</a></li>
                 <li><a href="#recipes" class="nav-link">Recipes</a></li>
                 <li><a href="about.html" class="nav-link">About Us</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
             <button class="nav-toggle" aria-label="Toggle navigation">
                 <span></span>
@@ -62,8 +120,7 @@
                 </div>
             </div>
             <div class="hero-image">
-                <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg"
-                    alt="Spices in spoons with spice ingredients" loading="lazy">
+                <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/3b19c93715304347a750e9e38e89193f.jpg" alt="Spices in spoons with spice ingredients" loading="lazy">
             </div>
         </section>
 
@@ -71,6 +128,17 @@
         <section class="filters" id="recipes">
             <div class="container">
                 <h3>Find Your Perfect Curry</h3>
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <input type="text" id="search-input" class="search-input" placeholder="Search recipes by name or ingredients..." />
+                        <button class="search-button" onclick="performSearch()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div class="filter-grid">
                     <div class="filter-group">
                         <label for="region-filter">Region</label>
@@ -127,8 +195,7 @@
         <!-- Recipe Modal -->
         <div class="modal" id="recipe-modal">
             <div class="modal-content">
-                <button class="close" onclick="closeModal()" aria-label="Close recipe details"
-                    title="Close (Press Esc)"></button>
+                <button class="close" onclick="closeModal()" aria-label="Close recipe details" title="Close (Press Esc)"></button>
                 <div class="modal-body" id="modal-body">
                     <!-- Recipe details will be loaded here -->
                 </div>
@@ -141,13 +208,11 @@
             <div class="footer-content">
                 <div class="footer-main">
                     <div class="footer-brand">
-                        <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png"
-                            alt="Let's Cook Curry Logo" class="footer-logo">
+                        <img src="https://public.youware.com/users-website-assets/prod/b803843b-b98d-4f40-bc7e-c4e46fc07c86/c66f443d4c424ba1ad3aca11e41bf818.png" alt="Let's Cook Curry Logo" class="footer-logo">
                         <h3>Let's Cook Curry</h3>
-                        <p>From our kitchen in Sydney to yours, we share a passion for authentic Indian food. Find
-                            simple recipes and bring the warmth of homemade curry to your table.</p>
+                        <p>From our kitchen in Sydney to yours, we share a passion for authentic Indian food. Find simple recipes and bring the warmth of homemade curry to your table.</p>
                     </div>
-
+                    
                     <div class="footer-links">
                         <div class="footer-section">
                             <h4>Explore</h4>
@@ -155,10 +220,10 @@
                                 <li><a href="index.html">Home</a></li>
                                 <li><a href="#recipes">All Recipes</a></li>
                                 <li><a href="about.html">About Us</a></li>
-                                <li><a href="#contact">Contact</a></li>
+                                <li><a href="contact.html">Contact</a></li>
                             </ul>
                         </div>
-
+                        
                         <div class="footer-section">
                             <h4>Recipes by Region</h4>
                             <ul>
@@ -168,17 +233,16 @@
                                 <li><a href="index.html?region=west" data-filter="west">West Indian</a></li>
                             </ul>
                         </div>
-
+                        
 
                     </div>
                 </div>
-
+                
                 <div class="footer-bottom">
                     <div class="footer-divider"></div>
                     <div class="footer-bottom-content">
                         <p>&copy; 2024 Let's Cook Curry. Made with ❤️ for curry lovers everywhere.</p>
-                        <p class="footer-tagline">"Where every spice tells a story, and every dish carries tradition."
-                        </p>
+                        <p class="footer-tagline">"Where every spice tells a story, and every dish carries tradition."</p>
                     </div>
                 </div>
             </div>
@@ -187,5 +251,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>
